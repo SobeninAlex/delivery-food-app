@@ -1,5 +1,9 @@
 package com.example.delivery_food_app.domain.entity
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class Product(
     val id: Long,
     val categoryId: Long, //категория продукта
@@ -12,7 +16,6 @@ data class Product(
     val proteins: String, //белки, г
     val fats: String, //жиры, г
     val carbohydrates: String, //углеводы, г
-//    val isSpicy: Boolean,
-//    val isVegan: Boolean,
-)
+    val tags: List<Int>
+) : Parcelable
 

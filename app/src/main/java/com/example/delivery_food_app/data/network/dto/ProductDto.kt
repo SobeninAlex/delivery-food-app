@@ -15,5 +15,5 @@ data class ProductDto(
     @SerializedName("proteins_per_100_grams") val proteinsPer100Grams: Double,
     @SerializedName("fats_per_100_grams") val fatsPer100Grams: Double,
     @SerializedName("carbohydrates_per_100_grams") val carbohydratesPer100Grams: Double,
-    @SerializedName("tag_ids") val tagIds: List<TagDto>,
+    @SerializedName("tag_ids") val tagIds: List<Int>,
 )

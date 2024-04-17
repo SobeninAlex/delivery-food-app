@@ -2,6 +2,7 @@ package com.example.delivery_food_app.data.mapper
 
 import com.example.delivery_food_app.data.network.dto.ProductDto
 import com.example.delivery_food_app.domain.entity.Product
+import com.example.delivery_food_app.domain.entity.Tag
 
 fun ProductDto.toEntity(): Product = Product(
     id = this.id,
@@ -14,7 +15,8 @@ fun ProductDto.toEntity(): Product = Product(
     energyValue = "${this.energyPer100Grams} ккал",
     proteins = this.proteinsPer100Grams.toString(),
     fats = this.fatsPer100Grams.toString(),
-    carbohydrates = this.carbohydratesPer100Grams.toString()
+    carbohydrates = this.carbohydratesPer100Grams.toString(),
+    tags = this.tagIds
 )
 
 private fun Long.toFormattedPrice(): String {

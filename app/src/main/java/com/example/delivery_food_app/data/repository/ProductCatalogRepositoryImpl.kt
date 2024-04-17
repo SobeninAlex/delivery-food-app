@@ -12,13 +12,13 @@ class ProductCatalogRepositoryImpl @Inject constructor(
 ) : ProductCatalogRepository {
 
     override suspend fun getProductCatalog(): List<Product> {
-        val response = apiService.getProducts().map { it.toEntity() }
-        response.forEach { product ->
+        val productList = apiService.getProducts().map { it.toEntity() }
+        productList.forEach { product ->
             ProductCatalog.addToCatalog(
                 product = product
             )
         }
-        return response
+        return productList
     }
 
 }
