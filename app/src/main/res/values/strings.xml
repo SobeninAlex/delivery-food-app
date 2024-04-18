@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">delivery-food-app</string>
+    <string name="in_basket">В корзину за %1$s</string>
 </resources>

@@ -13,12 +13,12 @@ fun ProductDto.toEntity(): Product = Product(
     priceOld = this.priceOld?.toFormattedPrice(),
     weight = "${this.measure} ${this.measureUnit}",
     energyValue = "${this.energyPer100Grams} ккал",
-    proteins = this.proteinsPer100Grams.toString(),
-    fats = this.fatsPer100Grams.toString(),
-    carbohydrates = this.carbohydratesPer100Grams.toString(),
+    proteins = "${this.proteinsPer100Grams} ${this.measureUnit}",
+    fats = "${this.fatsPer100Grams} ${this.measureUnit}",
+    carbohydrates = "${this.carbohydratesPer100Grams} ${this.measureUnit}",
     tags = this.tagIds
 )
 
 private fun Long.toFormattedPrice(): String {
-     return (this / 100).toInt().toString()
+     return "${(this / 100).toInt()} ₽"
 }
