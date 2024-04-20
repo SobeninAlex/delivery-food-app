@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
 import com.example.delivery_food_app.domain.entity.Product
+import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.utill.componentScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -16,12 +17,12 @@ import kotlinx.coroutines.launch
 
 class DefaultDetailsComponent @AssistedInject constructor (
     private val storeFactory: DetailsStoreFactory,
-    @Assisted("product") private val product: Product,
+    @Assisted("productItem") private val productItem: ProductItem,
     @Assisted("onBackClicked") private val onBackClicked: () -> Unit,
     @Assisted("componentContext") componentContext: ComponentContext,
 ) : DetailsComponent, ComponentContext by componentContext {
 
-    private val store = instanceKeeper.getStore { storeFactory.create(product) }
+    private val store = instanceKeeper.getStore { storeFactory.create(productItem) }
     private val scope = componentScope()
 
     init {
@@ -43,14 +44,14 @@ class DefaultDetailsComponent @AssistedInject constructor (
         store.accept(DetailsStore.Intent.ClickBack)
     }
 
-    override fun onClickAddToBasket(product: Product) {
-        store.accept(DetailsStore.Intent.ClickAddToBasket(product))
+    override fun onClickAddToBasket(productItem: ProductItem) {
+        store.accept(DetailsStore.Intent.ClickAddToBasket(productItem))
     }
 
     @AssistedFactory
     interface Factory {
         fun create(
-            @Assisted("product") product: Product,
+            @Assisted("productItem") productItem: ProductItem,
             @Assisted("onBackClicked") onBackClicked: () -> Unit,
             @Assisted("componentContext") componentContext: ComponentContext,
         ): DefaultDetailsComponent

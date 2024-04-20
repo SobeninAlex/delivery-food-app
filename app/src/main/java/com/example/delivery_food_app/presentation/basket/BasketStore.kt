@@ -5,11 +5,9 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
-import com.example.delivery_food_app.domain.entity.Product
 import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.domain.usecase.ChangeContentBasketUseCase
 import com.example.delivery_food_app.domain.usecase.GetContentBasketUseCase
-import com.example.delivery_food_app.domain.usecase.ObserveCountProductsStateUseCase
 import com.example.delivery_food_app.presentation.basket.BasketStore.Intent
 import com.example.delivery_food_app.presentation.basket.BasketStore.Label
 import com.example.delivery_food_app.presentation.basket.BasketStore.State
@@ -21,9 +19,9 @@ interface BasketStore : Store<Intent, State, Label> {
     sealed interface Intent {
         data object ClickBack : Intent
 
-        data class ClickAddToBasket(val product: Product) : Intent
+        data class ClickAddToBasket(val productItem: ProductItem) : Intent
 
-        data class ClickRemoveFromBasket(val product: Product) : Intent
+        data class ClickRemoveFromBasket(val productItem: ProductItem) : Intent
     }
 
     data class State(
@@ -47,7 +45,6 @@ class BasketStoreFactory @Inject constructor(
     private val storeFactory: StoreFactory,
     private val getContentBasketUseCase: GetContentBasketUseCase,
     private val changeContentBasketUseCase: ChangeContentBasketUseCase,
-    private val observeCountProductsStateUseCase: ObserveCountProductsStateUseCase
 ) {
 
     fun create(): BasketStore =
@@ -64,26 +61,18 @@ class BasketStoreFactory @Inject constructor(
     private sealed interface Action {
         data class BasketContentLoaded(val products: List<ProductItem>) : Action
 
-        data class ChangeCountProduct(val productItem: ProductItem) : Action
     }
 
     private sealed interface Msg {
         data class BasketContentLoaded(val products: List<ProductItem>) : Msg
 
-        data class ChangeCountProduct(val productItem: ProductItem) : Msg
     }
 
-    private inner class BootstrapperImpl(val productItem: ProductItem) : CoroutineBootstrapper<Action>() {
+    private inner class BootstrapperImpl : CoroutineBootstrapper<Action>() {
         override fun invoke() {
             scope.launch {
                 getContentBasketUseCase().collect { products ->
                     dispatch(Action.BasketContentLoaded(products))
-                }
-            }
-
-            scope.launch {
-                observeCountProductsStateUseCase(productItem.id).collect { productItem ->
-                    dispatch(Action.ChangeCountProduct(productItem))
                 }
             }
         }
@@ -94,13 +83,13 @@ class BasketStoreFactory @Inject constructor(
             when (intent) {
                 is Intent.ClickAddToBasket -> {
                     scope.launch {
-                        changeContentBasketUseCase.addToBasket(intent.product)
+                        changeContentBasketUseCase.addToBasket(intent.productItem)
                     }
                 }
 
                 is Intent.ClickRemoveFromBasket -> {
                     scope.launch {
-                        changeContentBasketUseCase.removeFromBasket(intent.product)
+                        changeContentBasketUseCase.removeFromBasket(intent.productItem)
                     }
                 }
 
@@ -114,10 +103,6 @@ class BasketStoreFactory @Inject constructor(
             when (action) {
                 is Action.BasketContentLoaded -> {
                     dispatch(Msg.BasketContentLoaded(action.products))
-                }
-
-                is Action.ChangeCountProduct -> {
-                    dispatch(Msg.ChangeCountProduct(action.productItem))
                 }
             }
         }
@@ -133,12 +118,6 @@ class BasketStoreFactory @Inject constructor(
                 }
                 copy(
                     productState = state
-                )
-            }
-
-            is Msg.ChangeCountProduct -> {
-                copy(
-                    productState = productState
                 )
             }
         }

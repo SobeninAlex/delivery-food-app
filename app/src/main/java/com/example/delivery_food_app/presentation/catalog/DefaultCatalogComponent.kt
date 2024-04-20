@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
 import com.example.delivery_food_app.domain.entity.Product
+import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.utill.componentScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -15,7 +16,7 @@ import kotlinx.coroutines.launch
 
 class DefaultCatalogComponent @AssistedInject constructor(
     private val storeFactory: CatalogStoreFactory,
-    @Assisted("onProductItemClicked") private val onProductItemClicked: (Product) -> Unit,
+    @Assisted("onProductItemClicked") private val onProductItemClicked: (ProductItem) -> Unit,
     @Assisted("onBasketIconClicked") private val onBasketIconClicked: () -> Unit,
     @Assisted("componentContext") componentContext: ComponentContext,
 ) : CatalogComponent, ComponentContext by componentContext {
@@ -28,7 +29,7 @@ class DefaultCatalogComponent @AssistedInject constructor(
             store.labels.collect {
                 when (it) {
                     is CatalogStore.Label.ClickProduct -> {
-                        onProductItemClicked(it.product)
+                        onProductItemClicked(it.productItem)
                     }
 
                     is CatalogStore.Label.ClickBasketIcon -> {
@@ -42,16 +43,16 @@ class DefaultCatalogComponent @AssistedInject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     override val model: StateFlow<CatalogStore.State> = store.stateFlow
 
-    override fun onClickProduct(product: Product) {
-        store.accept(CatalogStore.Intent.ClickProduct(product))
+    override fun onClickProduct(productItem: ProductItem) {
+        store.accept(CatalogStore.Intent.ClickProduct(productItem))
     }
 
-    override fun onClickAddToBasket(product: Product) {
-        store.accept(CatalogStore.Intent.ClickAddToBasket(product))
+    override fun onClickAddToBasket(productItem: ProductItem) {
+        store.accept(CatalogStore.Intent.ClickAddToBasket(productItem))
     }
 
-    override fun onClickRemoveFromBasket(product: Product) {
-        store.accept(CatalogStore.Intent.ClickRemoveFromBasket(product))
+    override fun onClickRemoveFromBasket(productItem: ProductItem) {
+        store.accept(CatalogStore.Intent.ClickRemoveFromBasket(productItem))
     }
 
     override fun onClickBasketIcon() {
@@ -61,7 +62,7 @@ class DefaultCatalogComponent @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            @Assisted("onProductItemClicked") onProductItemClicked: (Product) -> Unit,
+            @Assisted("onProductItemClicked") onProductItemClicked: (ProductItem) -> Unit,
             @Assisted("onBasketIconClicked") onBasketIconClicked: () -> Unit,
             @Assisted("componentContext") componentContext: ComponentContext,
         ): DefaultCatalogComponent

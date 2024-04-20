@@ -2,9 +2,6 @@ package com.example.delivery_food_app.presentation.details
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,7 +30,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -45,12 +40,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.delivery_food_app.R
-import com.example.delivery_food_app.domain.entity.Product
+import com.example.delivery_food_app.domain.entity.ProductItem
 
 @Composable
 fun DetailsContent(
@@ -69,7 +61,7 @@ fun DetailsContent(
             is DetailsStore.State.ProductState.Error -> {}
             is DetailsStore.State.ProductState.Initial -> {}
             is DetailsStore.State.ProductState.Loaded -> {
-                when (currentState.product) {
+                when (currentState.productItem) {
                     null -> {
 //                        ProductNotFound()
                         TODO("реализовать функцию если product == nul")
@@ -77,9 +69,9 @@ fun DetailsContent(
 
                     else -> {
                         Content(
-                            product = currentState.product,
+                            productItem = currentState.productItem,
                             paddingValues = paddingValues,
-                            onClickAddToBasket = { component.onClickAddToBasket(currentState.product) },
+                            onClickAddToBasket = { component.onClickAddToBasket(currentState.productItem) },
                             onClickBack = {
                                 component.onClickBack()
                             }
@@ -106,7 +98,7 @@ fun DetailsContent(
 private fun Content(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
-    product: Product,
+    productItem: ProductItem,
     onClickBack: () -> Unit,
     onClickAddToBasket: () -> Unit
 ) {
@@ -145,7 +137,7 @@ private fun Content(
             Box(
                 modifier = modifier
             ) {
-                ProductInfoDetail(product = product)
+                ProductInfoDetail(productItem = productItem)
             }
         }
 
@@ -170,7 +162,7 @@ private fun Content(
                 onClick = { onClickAddToBasket() }
             ) {
                 Text(
-                    text = stringResource(R.string.in_basket, product.priceCurrent),
+                    text = stringResource(R.string.in_basket, productItem.product.priceCurrent),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.White
                 )
@@ -182,7 +174,7 @@ private fun Content(
 @Composable
 private fun ProductInfoDetail(
     modifier: Modifier = Modifier,
-    product: Product
+    productItem: ProductItem
 ) {
     Column {
         Column(
@@ -190,12 +182,12 @@ private fun ProductInfoDetail(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = product.name,
+                text = productItem.product.name,
                 style = MaterialTheme.typography.titleLarge
             )
 
             Text(
-                text = product.description,
+                text = productItem.product.description,
                 style = MaterialTheme.typography.bodySmall
             )
         }
@@ -203,11 +195,11 @@ private fun ProductInfoDetail(
         Spacer(modifier = modifier.height(24.dp))
         HorizontalDivider(thickness = 2.dp, color = DividerDefaults.color)
 
-        InfoItem(name = "Вес", value = product.weight)
-        InfoItem(name = "Энерг. ценность", value = product.energyValue)
-        InfoItem(name = "Белки", value = product.proteins)
-        InfoItem(name = "Жиры", value = product.fats)
-        InfoItem(name = "Углеводы", value = product.carbohydrates)
+        InfoItem(name = "Вес", value = productItem.product.weight)
+        InfoItem(name = "Энерг. ценность", value = productItem.product.energyValue)
+        InfoItem(name = "Белки", value = productItem.product.proteins)
+        InfoItem(name = "Жиры", value = productItem.product.fats)
+        InfoItem(name = "Углеводы", value = productItem.product.carbohydrates)
         Spacer(modifier = modifier.height(80.dp))
     }
 }

@@ -140,8 +140,8 @@ fun Content(
     modifier: Modifier = Modifier,
     products: List<ProductItem>,
     paddingValues: PaddingValues,
-    onClickRemovedFromBasket: (Product) -> Unit,
-    onClickAddToBasket: (Product) -> Unit
+    onClickRemovedFromBasket: (ProductItem) -> Unit,
+    onClickAddToBasket: (ProductItem) -> Unit
 ) {
     Box(
         modifier = modifier
@@ -162,10 +162,10 @@ fun Content(
                     product = productItem.product,
                     count = productItem.count.toString(),
                     onClickRemovedFromBasket = {
-                        onClickRemovedFromBasket(productItem.product)
+                        onClickRemovedFromBasket(productItem)
                     },
                     onClickAddToBasket = {
-                        onClickAddToBasket(productItem.product)
+                        onClickAddToBasket(productItem)
                     }
                 )
             }

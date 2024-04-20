@@ -1,6 +1,7 @@
 package com.example.delivery_food_app.presentation.details
 
 import com.example.delivery_food_app.domain.entity.Product
+import com.example.delivery_food_app.domain.entity.ProductItem
 import kotlinx.coroutines.flow.StateFlow
 
 interface DetailsComponent {
@@ -11,6 +12,6 @@ interface DetailsComponent {
     //действия пользователя
     fun onClickBack()
 
-    fun onClickAddToBasket(product: Product)
+    fun onClickAddToBasket(productItem: ProductItem)
 
 }

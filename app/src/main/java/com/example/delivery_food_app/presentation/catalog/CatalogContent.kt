@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.delivery_food_app.R
 import com.example.delivery_food_app.domain.entity.Product
+import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.presentation.ui.component.LineThroughText
 import com.example.delivery_food_app.presentation.ui.theme.ContainerColor
 
@@ -93,10 +94,10 @@ fun CatalogContent(
 @Composable
 private fun Catalog(
     modifier: Modifier = Modifier,
-    products: List<Product>,
+    products: List<ProductItem>,
     onClickBasketIcon: () -> Unit,
-    onClickCard: (Product) -> Unit,
-    onClickAddToBasket: (Product) -> Unit
+    onClickCard: (ProductItem) -> Unit,
+    onClickAddToBasket: (ProductItem) -> Unit
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -119,14 +120,14 @@ private fun Catalog(
             items(
                 items = products,
                 key = { it.id }
-            ) { product ->
+            ) { productItem ->
                 ProductCard(
-                    product = product,
+                    product = productItem.product,
                     onClickCard = {
-                        onClickCard(product)
+                        onClickCard(productItem)
                     },
                     onClickAddToBasket = {
-                        onClickAddToBasket(product)
+                        onClickAddToBasket(ProductItem(product = productItem.product))
                     }
                 )
             }

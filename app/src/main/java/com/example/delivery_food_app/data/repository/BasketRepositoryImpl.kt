@@ -1,7 +1,6 @@
 package com.example.delivery_food_app.data.repository
 
 import android.util.Log
-import com.example.delivery_food_app.domain.entity.Product
 import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.domain.repository.BasketRepository
 import kotlinx.coroutines.flow.Flow
@@ -11,8 +10,8 @@ import javax.inject.Inject
 
 class BasketRepositoryImpl @Inject constructor() : BasketRepository {
 
-    private val _basketList = mutableListOf<ProductItem>()
-    private val basketList get() = _basketList.toList()
+    private val _basketList = mutableMapOf<Long, ProductItem>()
+    private val basketList get() = _basketList.values.toList()
 
     private val basketChangeEvent = MutableSharedFlow<Unit>(replay = 1).apply {
         tryEmit(Unit)
@@ -25,56 +24,55 @@ class BasketRepositoryImpl @Inject constructor() : BasketRepository {
         }
     }
 
-    override fun observeCountProducts(productId: Long): Flow<ProductItem> = flow {
-        val productItem = basketList.find {
-            it.id == productId
+    override suspend fun addToBasket(productItem: ProductItem) {
+        val item = basketList.find {
+            it.id == productItem.id
         }
 
-        if (productItem != null) {
-            emit(productItem)
-        }
-    }
-
-    override suspend fun addToBasket(product: Product) {
-        val productItem = basketList.find {
-            it.product == product
-        }
-
-        if (productItem != null) {
-            productItem.count++
-            productItem.price += product.priceCurrent
-            Log.d("Basket", "counter++")
+        if (item != null) {
+            val newCount = item.count + 1
+            val newPrice = item.price + productItem.product.priceCurrent
+            val newProductItem = item.copy(
+                count = newCount,
+                price = newPrice
+            )
+            _basketList[item.id] = newProductItem
+            Log.d("Basket", "edit product $newProductItem")
         } else {
             val newProduct = ProductItem(
-                id = product.id,
                 count = 1,
-                price = product.priceCurrent,
-                product = product
+                price = productItem.product.priceCurrent,
+                product = productItem.product
             )
-            _basketList.add(newProduct)
+            _basketList[productItem.id] = newProduct
             Log.d("Basket", "add new product $newProduct")
         }
 
         basketChangeEvent.tryEmit(Unit)
-        Log.d("Basket", "addToBasket")
+        Log.d("Basket", "emit basketList")
     }
 
-    override suspend fun removeFromBasket(product: Product) {
-        val productItem = basketList.find {
-            it.product == product
+    override suspend fun removeFromBasket(productItem: ProductItem) {
+        val item = basketList.find {
+            it.id == productItem.id
         }
 
-        if (productItem != null && productItem.count > 1) {
-            productItem.count--
-            productItem.price -= product.priceCurrent
-            Log.d("Basket", "counter--")
+        if (item != null && item.count > 1) {
+            val newCount = item.count - 1
+            val newPrice = item.price - productItem.product.priceCurrent
+            val newProductItem = item.copy(
+                count = newCount,
+                price = newPrice
+            )
+            _basketList[item.id] = newProductItem
+            Log.d("Basket", "edit product $newProductItem")
         } else {
-            _basketList.remove(productItem)
-            Log.d("Basket", "remover all products")
+            _basketList.remove(productItem.id)
+            Log.d("Basket", "remove product")
         }
 
         basketChangeEvent.tryEmit(Unit)
-        Log.d("Basket", "removeFromBasket")
+        Log.d("Basket", "emit basketList")
     }
 
 }

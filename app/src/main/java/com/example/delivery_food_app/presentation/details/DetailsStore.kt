@@ -6,6 +6,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.example.delivery_food_app.domain.entity.Product
+import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.domain.usecase.ChangeContentBasketUseCase
 import com.example.delivery_food_app.domain.usecase.GetProductDetailUseCase
 import com.example.delivery_food_app.presentation.details.DetailsStore.Intent
@@ -20,7 +21,7 @@ interface DetailsStore : Store<Intent, State, Label> {
         //действия пользователя
         data object ClickBack : Intent
 
-        data class ClickAddToBasket(val product: Product): Intent
+        data class ClickAddToBasket(val productItem: ProductItem): Intent
     }
 
     data class State(
@@ -33,7 +34,7 @@ interface DetailsStore : Store<Intent, State, Label> {
 
             data object Error : ProductState
 
-            data class Loaded(val product: Product?) : ProductState
+            data class Loaded(val productItem: ProductItem) : ProductState
         }
     }
 
@@ -50,13 +51,13 @@ class DetailsStoreFactory @Inject constructor(
     private val changeContentBasketUseCase: ChangeContentBasketUseCase
 ) {
 
-    fun create(product: Product?): DetailsStore =
+    fun create(productItem: ProductItem): DetailsStore =
         object : DetailsStore, Store<Intent, State, Label> by storeFactory.create(
             name = "DetailsStore",
             initialState = State(
                 productState = State.ProductState.Initial
             ),
-            bootstrapper = BootstrapperImpl(product),
+            bootstrapper = BootstrapperImpl(productItem),
             executorFactory = ::ExecutorImpl,
             reducer = ReducerImpl
         ) {}
@@ -67,7 +68,7 @@ class DetailsStoreFactory @Inject constructor(
 
         data object ProductLoadingError : Action
 
-        data class ProductLoaded(val product: Product?) : Action
+        data class ProductLoaded(val productItem: ProductItem) : Action
     }
 
     private sealed interface Msg {
@@ -76,17 +77,17 @@ class DetailsStoreFactory @Inject constructor(
 
         data object ProductLoadingError : Msg
 
-        data class ProductLoaded(val product: Product?) : Msg
+        data class ProductLoaded(val productItem: ProductItem) : Msg
     }
 
-    private inner class BootstrapperImpl(private val product: Product?) : CoroutineBootstrapper<Action>() {
+    private inner class BootstrapperImpl(private val productItem: ProductItem) : CoroutineBootstrapper<Action>() {
 
         //загрузка из репозитория при создании DetailsStore
         override fun invoke() {
             scope.launch {
                 dispatch(Action.ProductStartLoading)
                 try {
-                    val product = product?.id?.let { getProductDetailUseCase(it) }
+                    val product = getProductDetailUseCase(productItem.id)
                     dispatch(Action.ProductLoaded(product))
                 } catch (e: Exception) {
                     dispatch(Action.ProductLoadingError)
@@ -101,7 +102,7 @@ class DetailsStoreFactory @Inject constructor(
             when (intent) {
                 is Intent.ClickAddToBasket -> {
                     scope.launch {
-                        changeContentBasketUseCase.addToBasket(intent.product)
+                        changeContentBasketUseCase.addToBasket(intent.productItem)
                     }
                 }
 
@@ -114,7 +115,7 @@ class DetailsStoreFactory @Inject constructor(
         override fun executeAction(action: Action, getState: () -> State) {
             when (action) {
                 is Action.ProductLoaded -> {
-                    dispatch(Msg.ProductLoaded(action.product))
+                    dispatch(Msg.ProductLoaded(action.productItem))
                 }
 
                 is Action.ProductLoadingError -> {
@@ -133,7 +134,7 @@ class DetailsStoreFactory @Inject constructor(
         override fun State.reduce(msg: Msg): State = when (msg) {
             is Msg.ProductLoaded -> {
                 copy(
-                    productState = State.ProductState.Loaded(msg.product)
+                    productState = State.ProductState.Loaded(msg.productItem)
                 )
             }
 

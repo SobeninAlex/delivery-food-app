@@ -1,17 +1,18 @@
 package com.example.delivery_food_app.presentation.catalog
 
 import com.example.delivery_food_app.domain.entity.Product
+import com.example.delivery_food_app.domain.entity.ProductItem
 import kotlinx.coroutines.flow.StateFlow
 
 interface CatalogComponent {
 
     val model: StateFlow<CatalogStore.State>
 
-    fun onClickProduct(product: Product)
+    fun onClickProduct(productItem: ProductItem)
 
-    fun onClickAddToBasket(product: Product)
+    fun onClickAddToBasket(productItem: ProductItem)
 
-    fun onClickRemoveFromBasket(product: Product)
+    fun onClickRemoveFromBasket(productItem: ProductItem)
 
     fun onClickBasketIcon()
 

@@ -6,6 +6,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.example.delivery_food_app.domain.entity.Product
+import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.domain.usecase.ChangeContentBasketUseCase
 import com.example.delivery_food_app.domain.usecase.GetProductsCatalogUseCase
 import com.example.delivery_food_app.presentation.catalog.CatalogStore.Intent
@@ -17,11 +18,11 @@ import javax.inject.Inject
 interface CatalogStore : Store<Intent, State, Label> {
 
     sealed interface Intent {
-        data class ClickProduct(val product: Product) : Intent
+        data class ClickProduct(val productItem: ProductItem) : Intent
 
-        data class ClickAddToBasket(val product: Product) : Intent
+        data class ClickAddToBasket(val productItem: ProductItem) : Intent
 
-        data class ClickRemoveFromBasket(val product: Product) : Intent
+        data class ClickRemoveFromBasket(val productItem: ProductItem) : Intent
 
         data object ClickBasketIcon : Intent
     }
@@ -37,12 +38,12 @@ interface CatalogStore : Store<Intent, State, Label> {
 
             data object Error : ProductStatus
 
-            data class Loaded(val products: List<Product>) : ProductStatus
+            data class Loaded(val products: List<ProductItem>) : ProductStatus
         }
     }
 
     sealed interface Label {
-        data class ClickProduct(val product: Product) : Label
+        data class ClickProduct(val productItem: ProductItem) : Label
 
         data object ClickBasketIcon : Label
     }
@@ -71,7 +72,7 @@ class CatalogStoreFactory @Inject constructor(
 
         data object CatalogLoadingError : Action
 
-        data class CatalogLoaded(val products: List<Product>) : Action
+        data class CatalogLoaded(val products: List<ProductItem>) : Action
     }
 
     private sealed interface Msg {
@@ -79,7 +80,7 @@ class CatalogStoreFactory @Inject constructor(
 
         data object CatalogLoadingError : Msg
 
-        data class CatalogLoaded(val products: List<Product>) : Msg
+        data class CatalogLoaded(val products: List<ProductItem>) : Msg
     }
 
     private inner class BootstrapperImpl : CoroutineBootstrapper<Action>() {
@@ -101,17 +102,17 @@ class CatalogStoreFactory @Inject constructor(
             when (intent) {
                 is Intent.ClickAddToBasket -> {
                     scope.launch {
-                        changeContentBasketUseCase.addToBasket(intent.product)
+                        changeContentBasketUseCase.addToBasket(intent.productItem)
                     }
                 }
 
                 is Intent.ClickProduct -> {
-                    publish(Label.ClickProduct(intent.product))
+                    publish(Label.ClickProduct(intent.productItem))
                 }
 
                 is Intent.ClickRemoveFromBasket -> {
                     scope.launch {
-                        changeContentBasketUseCase.removeFromBasket(intent.product)
+                        changeContentBasketUseCase.removeFromBasket(intent.productItem)
                     }
                 }
 

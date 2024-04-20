@@ -1,6 +1,7 @@
 package com.example.delivery_food_app.presentation.basket
 
 import com.example.delivery_food_app.domain.entity.Product
+import com.example.delivery_food_app.domain.entity.ProductItem
 import kotlinx.coroutines.flow.StateFlow
 
 interface BasketComponent {
@@ -9,8 +10,8 @@ interface BasketComponent {
 
     fun onClickBack()
 
-    fun onClickAddToBasket(product: Product)
+    fun onClickAddToBasket(productItem: ProductItem)
 
-    fun onClickRemoveFromBasket(product: Product)
+    fun onClickRemoveFromBasket(productItem: ProductItem)
 
 }

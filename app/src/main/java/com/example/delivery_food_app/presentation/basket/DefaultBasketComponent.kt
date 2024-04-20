@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.core.instancekeeper.getStore
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
 import com.example.delivery_food_app.domain.entity.Product
+import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.utill.componentScope
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -41,12 +42,12 @@ class DefaultBasketComponent @AssistedInject constructor(
         store.accept(BasketStore.Intent.ClickBack)
     }
 
-    override fun onClickAddToBasket(product: Product) {
-        store.accept(BasketStore.Intent.ClickAddToBasket(product))
+    override fun onClickAddToBasket(productItem: ProductItem) {
+        store.accept(BasketStore.Intent.ClickAddToBasket(productItem))
     }
 
-    override fun onClickRemoveFromBasket(product: Product) {
-        store.accept(BasketStore.Intent.ClickRemoveFromBasket(product))
+    override fun onClickRemoveFromBasket(productItem: ProductItem) {
+        store.accept(BasketStore.Intent.ClickRemoveFromBasket(productItem))
     }
 
     @AssistedFactory

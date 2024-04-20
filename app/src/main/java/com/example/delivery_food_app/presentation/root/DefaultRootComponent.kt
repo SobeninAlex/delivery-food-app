@@ -9,6 +9,7 @@ import com.arkivanov.decompose.router.stack.pop
 import com.arkivanov.decompose.router.stack.push
 import com.arkivanov.decompose.value.Value
 import com.example.delivery_food_app.domain.entity.Product
+import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.presentation.basket.DefaultBasketComponent
 import com.example.delivery_food_app.presentation.catalog.DefaultCatalogComponent
 import com.example.delivery_food_app.presentation.details.DefaultDetailsComponent
@@ -51,7 +52,7 @@ class DefaultRootComponent @AssistedInject constructor(
             is Config.Catalog -> {
                 val component = catalogComponentFactory.create(
                     onProductItemClicked = {
-                        navigation.push(Config.Details(product = it))
+                        navigation.push(Config.Details(productItem = it))
                     },
                     onBasketIconClicked = {
                         navigation.push(Config.Basket)
@@ -63,7 +64,7 @@ class DefaultRootComponent @AssistedInject constructor(
 
             is Config.Details -> {
                 val component = detailsComponentFactory.create(
-                    product = config.product,
+                    productItem = config.productItem,
                     onBackClicked = {
                         navigation.pop()
                     },
@@ -85,7 +86,7 @@ class DefaultRootComponent @AssistedInject constructor(
         data object Catalog : Config
 
         @Parcelize
-        data class Details(val product: Product) : Config
+        data class Details(val productItem: ProductItem) : Config
 
     }
 
