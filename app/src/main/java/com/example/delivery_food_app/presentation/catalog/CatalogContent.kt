@@ -57,6 +57,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.delivery_food_app.R
+import com.example.delivery_food_app.domain.entity.Product
 import com.example.delivery_food_app.presentation.ui.component.LineThroughText
 import com.example.delivery_food_app.presentation.ui.theme.ContainerColor
 
@@ -65,15 +66,44 @@ fun CatalogContent(
     modifier: Modifier = Modifier,
     component: CatalogComponent
 ) {
-
     val state by component.model.collectAsState()
 
+    when (val current = state.productsStatus) {
+        is CatalogStore.State.ProductStatus.Error -> {}
+        is CatalogStore.State.ProductStatus.Initial -> {}
+        is CatalogStore.State.ProductStatus.Loaded -> {
+            Catalog(
+                products = current.products,
+                onClickBasketIcon = {
+                    component.onClickBasketIcon()
+                },
+                onClickCard = {
+                    component.onClickProduct(it)
+                },
+                onClickAddToBasket = {
+                    component.onClickAddToBasket(it)
+                }
+            )
+        }
+
+        is CatalogStore.State.ProductStatus.Loading -> {}
+    }
+}
+
+@Composable
+private fun Catalog(
+    modifier: Modifier = Modifier,
+    products: List<Product>,
+    onClickBasketIcon: () -> Unit,
+    onClickCard: (Product) -> Unit,
+    onClickAddToBasket: (Product) -> Unit
+) {
     Scaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopBar(
-                onClickBasketIcon = { component.onClickBasketIcon() }
+                onClickBasketIcon = { onClickBasketIcon() }
             )
         }
     ) { paddingValues ->
@@ -87,16 +117,16 @@ fun CatalogContent(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(
-                items = state.productItems,
-                key = { it.product.id }
-            ) { productItem ->
+                items = products,
+                key = { it.id }
+            ) { product ->
                 ProductCard(
-                    productItem = productItem,
+                    product = product,
                     onClickCard = {
-                        component.onClickProduct(productItem.product)
+                        onClickCard(product)
                     },
                     onClickAddToBasket = {
-                        component.onClickAddToBasket(productItem.product)
+                        onClickAddToBasket(product)
                     }
                 )
             }
@@ -145,101 +175,84 @@ private fun TopBar(
 @Composable
 private fun ProductCard(
     modifier: Modifier = Modifier,
-    productItem: CatalogStore.State.ProductItem,
+    product: Product,
     onClickCard: () -> Unit,
     onClickAddToBasket: () -> Unit
 ) {
-
-    when (val state = productItem.productStatus) {
-        is CatalogStore.State.ProductStatus.Error -> {}
-        is CatalogStore.State.ProductStatus.Initial -> {}
-
-        is CatalogStore.State.ProductStatus.Loaded -> {
-            Card(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(290.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = ContainerColor,
-                    contentColor = Color.Black
-                ),
-                shape = RoundedCornerShape(size = 8.dp),
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(290.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = ContainerColor,
+            contentColor = Color.Black
+        ),
+        shape = RoundedCornerShape(size = 8.dp),
+    ) {
+        Column(
+            modifier = modifier
+                .fillMaxSize(),
+        ) {
+            Box(
+                modifier = modifier.clickable { onClickCard() },
             ) {
-                Column(
+                Image(
                     modifier = modifier
-                        .fillMaxSize(),
-                ) {
-                    Box(
-                        modifier = modifier.clickable { onClickCard() },
+                        .width(167.dp),
+                    painter = painterResource(id = R.drawable.prod_item),
+                    contentDescription = null
+                )
+            }
+            Column(
+                modifier = modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(
+                    maxLines = 1,
+                    text = product.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 14.sp
+                )
+
+                Text(
+                    text = product.weight,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontSize = 14.sp
+                )
+
+                Box(modifier = modifier.fillMaxSize()) {
+                    Button(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .height(40.dp)
+                            .align(Alignment.BottomCenter),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                        ),
+                        contentPadding = PaddingValues(horizontal = 4.dp),
+                        onClick = { onClickAddToBasket() },
                     ) {
-                        Image(
-                            modifier = modifier
-                                .width(167.dp),
-                            painter = painterResource(id = R.drawable.prod_item),
-                            contentDescription = null
-                        )
-                    }
-                    Column(
-                        modifier = modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Text(
-                            maxLines = 1,
-                            text = state.product.name,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontSize = 14.sp
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text(
+                                text = "${product.priceCurrent} ₽",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
 
-                        Text(
-                            text = state.product.weight,
-                            style = MaterialTheme.typography.bodySmall,
-                            fontSize = 14.sp
-                        )
-
-                        Box (modifier = modifier.fillMaxSize()) {
-                            Button(
-                                modifier = modifier
-                                    .fillMaxWidth()
-                                    .height(40.dp)
-                                    .align(Alignment.BottomCenter),
-                                shape = RoundedCornerShape(8.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.White,
-                                ),
-                                contentPadding = PaddingValues(horizontal = 4.dp),
-                                onClick = { onClickAddToBasket() },
-                            ) {
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                ) {
-                                    Text(
-                                        text = "${state.product.priceCurrent} ₽",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-
-                                    if (state.product.priceOld != null) {
-                                        LineThroughText(text = state.product.priceOld)
-                                    }
-                                }
+                            if (product.priceOld != null) {
+                                LineThroughText(text = product.priceOld)
                             }
                         }
                     }
                 }
             }
         }
-
-        is CatalogStore.State.ProductStatus.Loading -> {
-            Box(modifier = modifier.fillMaxSize()) {
-                CircularProgressIndicator(
-                    modifier = modifier
-                        .align(Alignment.Center),
-                    color = Color.Black
-                )
-            }
-        }
     }
 
 }
+
 
 
 

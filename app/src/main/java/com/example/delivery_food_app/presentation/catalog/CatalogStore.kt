@@ -27,12 +27,8 @@ interface CatalogStore : Store<Intent, State, Label> {
     }
 
     data class State(
-        val productItems: List<ProductItem>
+        val productsStatus: ProductStatus
     ) {
-        data class ProductItem(
-            val product: Product,
-            val productStatus: ProductStatus
-        )
 
         sealed interface ProductStatus {
             data object Initial : ProductStatus
@@ -41,7 +37,7 @@ interface CatalogStore : Store<Intent, State, Label> {
 
             data object Error : ProductStatus
 
-            data class Loaded(val product: Product) : ProductStatus
+            data class Loaded(val products: List<Product>) : ProductStatus
         }
     }
 
@@ -63,7 +59,7 @@ class CatalogStoreFactory @Inject constructor(
         object : CatalogStore, Store<Intent, State, Label> by storeFactory.create(
             name = "CatalogStore",
             initialState = State(
-                productItems = listOf()
+                productsStatus = State.ProductStatus.Initial
             ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = ::ExecutorImpl,
@@ -75,7 +71,7 @@ class CatalogStoreFactory @Inject constructor(
 
         data object CatalogLoadingError : Action
 
-        data class CatalogLoaded(val productList: List<Product>) : Action
+        data class CatalogLoaded(val products: List<Product>) : Action
     }
 
     private sealed interface Msg {
@@ -83,7 +79,7 @@ class CatalogStoreFactory @Inject constructor(
 
         data object CatalogLoadingError : Msg
 
-        data class CatalogLoaded(val productList: List<Product>) : Msg
+        data class CatalogLoaded(val products: List<Product>) : Msg
     }
 
     private inner class BootstrapperImpl : CoroutineBootstrapper<Action>() {
@@ -128,7 +124,7 @@ class CatalogStoreFactory @Inject constructor(
         override fun executeAction(action: Action, getState: () -> State) {
             when (action) {
                 is Action.CatalogLoaded -> {
-                    dispatch(Msg.CatalogLoaded(action.productList))
+                    dispatch(Msg.CatalogLoaded(action.products))
                 }
 
                 is Action.CatalogLoadingError -> {
@@ -146,32 +142,19 @@ class CatalogStoreFactory @Inject constructor(
         override fun State.reduce(msg: Msg): State = when (msg) {
             is Msg.CatalogLoaded -> {
                 copy(
-                    productItems = msg.productList.map {
-                        State.ProductItem(
-                            product = it,
-                            productStatus = State.ProductStatus.Loaded(it)
-                        )
-                    }
+                    productsStatus = State.ProductStatus.Loaded(msg.products)
                 )
             }
 
             is Msg.CatalogLoadingError -> {
                 copy(
-                    productItems = productItems.map {
-                        it.copy(
-                            productStatus = State.ProductStatus.Error
-                        )
-                    }
+                    productsStatus = State.ProductStatus.Error
                 )
             }
 
             is Msg.CatalogStartLoading -> {
                 copy(
-                    productItems = productItems.map {
-                        it.copy(
-                            productStatus = State.ProductStatus.Loading
-                        )
-                    }
+                    productsStatus = State.ProductStatus.Loading
                 )
             }
         }

@@ -11,16 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -37,10 +34,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -52,10 +45,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.delivery_food_app.R
 import com.example.delivery_food_app.domain.entity.Product
-import com.example.delivery_food_app.domain.entity.ProductWithCount
+import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.presentation.ui.component.Counter
 import com.example.delivery_food_app.presentation.ui.component.LineThroughText
-import com.example.delivery_food_app.presentation.ui.theme.ButtonsCounterColor
 
 
 @Composable
@@ -146,7 +138,7 @@ private fun TopBar(
 @Composable
 fun Content(
     modifier: Modifier = Modifier,
-    products: Map<Product, ProductWithCount>,
+    products: List<ProductItem>,
     paddingValues: PaddingValues,
     onClickRemovedFromBasket: (Product) -> Unit,
     onClickAddToBasket: (Product) -> Unit
@@ -161,17 +153,19 @@ fun Content(
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             items(
-                items = products.values.toList(),
-                key = { it.item.id }
-            ) { product ->
+                items = products,
+                key = {
+                    it.id
+                }
+            ) { productItem ->
                 ProductItem(
-                    product = product.item,
-                    count = product.count.toString(),
+                    product = productItem.product,
+                    count = productItem.count.toString(),
                     onClickRemovedFromBasket = {
-                        onClickRemovedFromBasket(product.item)
+                        onClickRemovedFromBasket(productItem.product)
                     },
                     onClickAddToBasket = {
-                        onClickAddToBasket(product.item)
+                        onClickAddToBasket(productItem.product)
                     }
                 )
             }
