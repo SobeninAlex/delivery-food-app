@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.delivery_food_app.domain.entity.Product
 import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.domain.repository.BasketRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -21,6 +22,16 @@ class BasketRepositoryImpl @Inject constructor() : BasketRepository {
         basketChangeEvent.collect {
             emit(basketList)
             Log.d("TAG", "basketChangeEvent")
+        }
+    }
+
+    override fun observeCountProducts(productId: Long): Flow<ProductItem> = flow {
+        val productItem = basketList.find {
+            it.id == productId
+        }
+
+        if (productItem != null) {
+            emit(productItem)
         }
     }
 

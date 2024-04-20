@@ -9,6 +9,7 @@ import com.example.delivery_food_app.domain.entity.Product
 import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.domain.usecase.ChangeContentBasketUseCase
 import com.example.delivery_food_app.domain.usecase.GetContentBasketUseCase
+import com.example.delivery_food_app.domain.usecase.ObserveCountProductsStateUseCase
 import com.example.delivery_food_app.presentation.basket.BasketStore.Intent
 import com.example.delivery_food_app.presentation.basket.BasketStore.Label
 import com.example.delivery_food_app.presentation.basket.BasketStore.State
@@ -46,6 +47,7 @@ class BasketStoreFactory @Inject constructor(
     private val storeFactory: StoreFactory,
     private val getContentBasketUseCase: GetContentBasketUseCase,
     private val changeContentBasketUseCase: ChangeContentBasketUseCase,
+    private val observeCountProductsStateUseCase: ObserveCountProductsStateUseCase
 ) {
 
     fun create(): BasketStore =
@@ -61,20 +63,27 @@ class BasketStoreFactory @Inject constructor(
 
     private sealed interface Action {
         data class BasketContentLoaded(val products: List<ProductItem>) : Action
+
+        data class ChangeCountProduct(val productItem: ProductItem) : Action
     }
 
     private sealed interface Msg {
         data class BasketContentLoaded(val products: List<ProductItem>) : Msg
 
-        data object BasketContentChange : Msg
-
+        data class ChangeCountProduct(val productItem: ProductItem) : Msg
     }
 
-    private inner class BootstrapperImpl : CoroutineBootstrapper<Action>() {
+    private inner class BootstrapperImpl(val productItem: ProductItem) : CoroutineBootstrapper<Action>() {
         override fun invoke() {
             scope.launch {
                 getContentBasketUseCase().collect { products ->
                     dispatch(Action.BasketContentLoaded(products))
+                }
+            }
+
+            scope.launch {
+                observeCountProductsStateUseCase(productItem.id).collect { productItem ->
+                    dispatch(Action.ChangeCountProduct(productItem))
                 }
             }
         }
@@ -86,14 +95,12 @@ class BasketStoreFactory @Inject constructor(
                 is Intent.ClickAddToBasket -> {
                     scope.launch {
                         changeContentBasketUseCase.addToBasket(intent.product)
-                        dispatch(Msg.BasketContentChange)
                     }
                 }
 
                 is Intent.ClickRemoveFromBasket -> {
                     scope.launch {
                         changeContentBasketUseCase.removeFromBasket(intent.product)
-                        dispatch(Msg.BasketContentChange)
                     }
                 }
 
@@ -108,18 +115,16 @@ class BasketStoreFactory @Inject constructor(
                 is Action.BasketContentLoaded -> {
                     dispatch(Msg.BasketContentLoaded(action.products))
                 }
+
+                is Action.ChangeCountProduct -> {
+                    dispatch(Msg.ChangeCountProduct(action.productItem))
+                }
             }
         }
     }
 
     private object ReducerImpl : Reducer<State, Msg> {
         override fun State.reduce(msg: Msg): State = when (msg) {
-            is Msg.BasketContentChange -> {
-                copy(
-                    productState = productState //TODO
-                )
-            }
-
             is Msg.BasketContentLoaded -> {
                 val state = if (msg.products.isEmpty()) {
                     State.ProductState.EmptyResult
@@ -128,6 +133,12 @@ class BasketStoreFactory @Inject constructor(
                 }
                 copy(
                     productState = state
+                )
+            }
+
+            is Msg.ChangeCountProduct -> {
+                copy(
+                    productState = productState
                 )
             }
         }

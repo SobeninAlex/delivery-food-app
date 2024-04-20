@@ -8,6 +8,8 @@ interface BasketRepository {
 
     val basketContent: Flow<List<ProductItem>>
 
+    fun observeCountProducts(productId: Long): Flow<ProductItem>
+
     suspend fun addToBasket(product: Product)
 
     suspend fun removeFromBasket(product: Product)
