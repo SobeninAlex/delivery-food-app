@@ -6,6 +6,7 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.example.delivery_food_app.domain.entity.Product
+import com.example.delivery_food_app.domain.entity.ProductWithCount
 import com.example.delivery_food_app.domain.usecase.ChangeContentBasketUseCase
 import com.example.delivery_food_app.domain.usecase.GetContentBasketUseCase
 import com.example.delivery_food_app.presentation.basket.BasketStore.Intent
@@ -32,7 +33,7 @@ interface BasketStore : Store<Intent, State, Label> {
 
             data object EmptyResult: ProductState
 
-            data class Loaded(val products: List<Product>) : ProductState
+            data class Loaded(val products: Map<Product, ProductWithCount>) : ProductState
         }
     }
 
@@ -59,11 +60,12 @@ class BasketStoreFactory @Inject constructor(
         ) {}
 
     private sealed interface Action {
-        data class BasketContentLoaded(val products: List<Product>) : Action
+        data class BasketContentLoaded(val products: Map<Product, ProductWithCount>) : Action
     }
 
     private sealed interface Msg {
-        data class BasketContentLoaded(val products: List<Product>) : Msg
+        data class BasketContentLoaded(val products: Map<Product, ProductWithCount>) : Msg
+
     }
 
     private inner class BootstrapperImpl : CoroutineBootstrapper<Action>() {

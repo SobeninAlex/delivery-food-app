@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Button
@@ -56,6 +57,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.delivery_food_app.R
+import com.example.delivery_food_app.presentation.ui.component.LineThroughText
 import com.example.delivery_food_app.presentation.ui.theme.ContainerColor
 
 @Composable
@@ -71,7 +73,7 @@ fun CatalogContent(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopBar(
-                onClickBasketIcon = { /*TODO*/ }
+                onClickBasketIcon = { component.onClickBasketIcon() }
             )
         }
     ) { paddingValues ->
@@ -92,6 +94,9 @@ fun CatalogContent(
                     productItem = productItem,
                     onClickCard = {
                         component.onClickProduct(productItem.product)
+                    },
+                    onClickAddToBasket = {
+                        component.onClickAddToBasket(productItem.product)
                     }
                 )
             }
@@ -126,9 +131,9 @@ private fun TopBar(
             }
         },
         actions = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { onClickBasketIcon() }) {
                 Icon(
-                    imageVector = Icons.Default.Search,
+                    imageVector = Icons.Default.ShoppingBasket,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )
@@ -142,6 +147,7 @@ private fun ProductCard(
     modifier: Modifier = Modifier,
     productItem: CatalogStore.State.ProductItem,
     onClickCard: () -> Unit,
+    onClickAddToBasket: () -> Unit
 ) {
 
     when (val state = productItem.productStatus) {
@@ -201,25 +207,18 @@ private fun ProductCard(
                                     containerColor = Color.White,
                                 ),
                                 contentPadding = PaddingValues(horizontal = 4.dp),
-                                onClick = { /*TODO*/ },
+                                onClick = { onClickAddToBasket() },
                             ) {
                                 Row(
                                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 ) {
                                     Text(
-                                        text = state.product.priceCurrent,
+                                        text = "${state.product.priceCurrent} ₽",
                                         style = MaterialTheme.typography.bodyMedium
                                     )
 
                                     if (state.product.priceOld != null) {
-                                        Text(
-                                            buildAnnotatedString {
-                                                withStyle(style = SpanStyle(textDecoration = TextDecoration.LineThrough)) {
-                                                    append(state.product.priceOld)
-                                                }
-                                            },
-                                            style = MaterialTheme.typography.bodySmall
-                                        )
+                                        LineThroughText(text = state.product.priceOld)
                                     }
                                 }
                             }

@@ -79,7 +79,7 @@ fun DetailsContent(
                         Content(
                             product = currentState.product,
                             paddingValues = paddingValues,
-                            onClickAddToBasket = {},
+                            onClickAddToBasket = { component.onClickAddToBasket(currentState.product) },
                             onClickBack = {
                                 component.onClickBack()
                             }

@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 class DefaultCatalogComponent @AssistedInject constructor(
     private val storeFactory: CatalogStoreFactory,
     @Assisted("onProductItemClicked") private val onProductItemClicked: (Product) -> Unit,
+    @Assisted("onBasketIconClicked") private val onBasketIconClicked: () -> Unit,
     @Assisted("componentContext") componentContext: ComponentContext,
 ) : CatalogComponent, ComponentContext by componentContext {
 
@@ -28,6 +29,10 @@ class DefaultCatalogComponent @AssistedInject constructor(
                 when (it) {
                     is CatalogStore.Label.ClickProduct -> {
                         onProductItemClicked(it.product)
+                    }
+
+                    is CatalogStore.Label.ClickBasketIcon -> {
+                        onBasketIconClicked()
                     }
                 }
             }
@@ -49,10 +54,15 @@ class DefaultCatalogComponent @AssistedInject constructor(
         store.accept(CatalogStore.Intent.ClickRemoveFromBasket(product))
     }
 
+    override fun onClickBasketIcon() {
+        store.accept(CatalogStore.Intent.ClickBasketIcon)
+    }
+
     @AssistedFactory
     interface Factory {
         fun create(
             @Assisted("onProductItemClicked") onProductItemClicked: (Product) -> Unit,
+            @Assisted("onBasketIconClicked") onBasketIconClicked: () -> Unit,
             @Assisted("componentContext") componentContext: ComponentContext,
         ): DefaultCatalogComponent
     }

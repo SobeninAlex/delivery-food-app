@@ -13,4 +13,6 @@ interface CatalogComponent {
 
     fun onClickRemoveFromBasket(product: Product)
 
+    fun onClickBasketIcon()
+
 }

@@ -22,6 +22,8 @@ interface CatalogStore : Store<Intent, State, Label> {
         data class ClickAddToBasket(val product: Product) : Intent
 
         data class ClickRemoveFromBasket(val product: Product) : Intent
+
+        data object ClickBasketIcon : Intent
     }
 
     data class State(
@@ -45,6 +47,8 @@ interface CatalogStore : Store<Intent, State, Label> {
 
     sealed interface Label {
         data class ClickProduct(val product: Product) : Label
+
+        data object ClickBasketIcon : Label
     }
 
 }
@@ -113,6 +117,10 @@ class CatalogStoreFactory @Inject constructor(
                     scope.launch {
                         changeContentBasketUseCase.removeFromBasket(intent.product)
                     }
+                }
+
+                is Intent.ClickBasketIcon -> {
+                    publish(Label.ClickBasketIcon)
                 }
             }
         }

@@ -11,19 +11,25 @@ import com.example.delivery_food_app.R
 
 val Typography = Typography(
     bodyMedium = TextStyle(
-        fontFamily = FontFamily(Font(R.font.roboto)),
+        fontFamily = FontFamily(Font(R.font.roboto_regular)),
         fontWeight = FontWeight.Bold,
         fontSize = 16.sp,
         color = Color.Black,
     ),
     titleLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.roboto)),
+        fontFamily = FontFamily(Font(R.font.roboto_regular)),
         fontWeight = FontWeight.Bold,
         fontSize = 32.sp,
         color = Color.Black
     ),
+    titleMedium = TextStyle(
+        fontFamily = FontFamily(Font(R.font.roboto_medium)),
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp,
+        color = Color.Black
+    ),
     bodySmall = TextStyle(
-        fontFamily = FontFamily(Font(R.font.roboto)),
+        fontFamily = FontFamily(Font(R.font.roboto_regular)),
         fontWeight = FontWeight.Thin,
         fontSize = 16.sp,
         color = Color.Black.copy(alpha = 0.6f),

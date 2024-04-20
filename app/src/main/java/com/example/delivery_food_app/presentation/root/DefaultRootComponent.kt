@@ -53,6 +53,9 @@ class DefaultRootComponent @AssistedInject constructor(
                     onProductItemClicked = {
                         navigation.push(Config.Details(product = it))
                     },
+                    onBasketIconClicked = {
+                        navigation.push(Config.Basket)
+                    },
                     componentContext = componentContext
                 )
                 RootComponent.Child.Catalog(component)
