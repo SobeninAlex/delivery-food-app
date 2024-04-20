@@ -14,4 +14,10 @@ object ProductCatalog {
         return _catalog[productId] ?: throw RuntimeException("item not found")
     }
 
+    fun searchProduct(query: String): List<ProductItem> {
+        return _catalog.values.filter {
+            it.product.name.contains(query)
+        }
+    }
+
 }
