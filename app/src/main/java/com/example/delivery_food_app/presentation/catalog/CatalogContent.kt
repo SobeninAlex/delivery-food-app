@@ -243,7 +243,10 @@ private fun ProductCard(
                             )
 
                             if (product.priceOld != null) {
-                                LineThroughText(text = product.priceOld)
+                                LineThroughText(
+                                    text = product.priceOld,
+                                    textStyle = MaterialTheme.typography.bodySmall
+                                )
                             }
                         }
                     }

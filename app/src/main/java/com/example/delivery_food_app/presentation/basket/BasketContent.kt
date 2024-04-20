@@ -143,6 +143,9 @@ fun Content(
     onClickRemovedFromBasket: (ProductItem) -> Unit,
     onClickAddToBasket: (ProductItem) -> Unit
 ) {
+
+    val totalPrice = products.sumOf { it.price }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -192,7 +195,7 @@ fun Content(
                 onClick = { /*TODO*/ }
             ) {
                 Text(
-                    text = stringResource(R.string.order, ""),
+                    text = stringResource(R.string.order, totalPrice),
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.White
                 )
@@ -240,7 +243,7 @@ private fun ProductItem(
             Column(
                 modifier = modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(top = 16.dp, end = 16.dp, bottom = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(
                     space = 24.dp,
                     Alignment.CenterVertically
@@ -262,25 +265,25 @@ private fun ProductItem(
                     )
 
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.End
                     ) {
                         Text(
                             text = "${product.priceCurrent} ₽",
                             style = MaterialTheme.typography.bodyMedium
                         )
                         if (product.priceOld != null) {
-                            LineThroughText(text = product.priceOld)
+                            LineThroughText(
+                                text = product.priceOld,
+                                textStyle = MaterialTheme.typography.bodySmall.copy(fontSize = 14.sp)
+                            )
                         }
                     }
-
                 }
             }
-
-
         }
     }
-
-//    HorizontalDivider(thickness = 2.dp, color = DividerDefaults.color.copy(alpha = 0.5f))
 }
 
 @Composable
