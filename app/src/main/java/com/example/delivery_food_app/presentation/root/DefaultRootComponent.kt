@@ -13,6 +13,7 @@ import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.presentation.basket.DefaultBasketComponent
 import com.example.delivery_food_app.presentation.catalog.DefaultCatalogComponent
 import com.example.delivery_food_app.presentation.details.DefaultDetailsComponent
+import com.example.delivery_food_app.presentation.search.DefaultSearchComponent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -22,6 +23,7 @@ class DefaultRootComponent @AssistedInject constructor(
     private val basketComponentFactory: DefaultBasketComponent.Factory,
     private val catalogComponentFactory: DefaultCatalogComponent.Factory,
     private val detailsComponentFactory: DefaultDetailsComponent.Factory,
+    private val searchComponentFactory: DefaultSearchComponent.Factory,
     @Assisted("componentContext") componentContext: ComponentContext
 ) : RootComponent, ComponentContext by componentContext {
 
@@ -37,7 +39,7 @@ class DefaultRootComponent @AssistedInject constructor(
     private fun child(
         config: Config,
         componentContext: ComponentContext
-    ) : RootComponent.Child {
+    ): RootComponent.Child {
         return when (config) {
             is Config.Basket -> {
                 val component = basketComponentFactory.create(
@@ -57,6 +59,9 @@ class DefaultRootComponent @AssistedInject constructor(
                     onBasketIconClicked = {
                         navigation.push(Config.Basket)
                     },
+                    onSearchIconClicked = {
+                        navigation.push(Config.Search)
+                    },
                     componentContext = componentContext
                 )
                 RootComponent.Child.Catalog(component)
@@ -71,6 +76,19 @@ class DefaultRootComponent @AssistedInject constructor(
                     componentContext = componentContext
                 )
                 RootComponent.Child.Details(component)
+            }
+
+            Config.Search -> {
+                val component = searchComponentFactory.create(
+                    onBackClicked = {
+                        navigation.pop()
+                    },
+                    onProductClicked = {
+                        navigation.push(Config.Details(productItem = it))
+                    },
+                    componentContext = componentContext
+                )
+                RootComponent.Child.Search(component)
             }
         }
     }
@@ -88,13 +106,16 @@ class DefaultRootComponent @AssistedInject constructor(
         @Parcelize
         data class Details(val productItem: ProductItem) : Config
 
+        @Parcelize
+        data object Search : Config
+
     }
 
     @AssistedFactory
     interface Factory {
         fun create(
             @Assisted("componentContext") componentContext: ComponentContext
-        ) : DefaultRootComponent
+        ): DefaultRootComponent
     }
 
 }

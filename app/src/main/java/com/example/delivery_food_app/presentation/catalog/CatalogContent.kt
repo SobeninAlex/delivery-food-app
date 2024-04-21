@@ -60,6 +60,7 @@ import com.example.delivery_food_app.R
 import com.example.delivery_food_app.domain.entity.Product
 import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.presentation.ui.component.LineThroughText
+import com.example.delivery_food_app.presentation.ui.component.Loader
 import com.example.delivery_food_app.presentation.ui.theme.ContainerColor
 
 @Composable
@@ -78,6 +79,9 @@ fun CatalogContent(
                 onClickBasketIcon = {
                     component.onClickBasketIcon()
                 },
+                onClickSearchIcon = {
+                    component.onClickSearchIcon()
+                },
                 onClickCard = {
                     component.onClickProduct(it)
                 },
@@ -87,7 +91,9 @@ fun CatalogContent(
             )
         }
 
-        is CatalogStore.State.ProductStatus.Loading -> {}
+        is CatalogStore.State.ProductStatus.Loading -> {
+            Loader()
+        }
     }
 }
 
@@ -96,6 +102,7 @@ private fun Catalog(
     modifier: Modifier = Modifier,
     products: List<ProductItem>,
     onClickBasketIcon: () -> Unit,
+    onClickSearchIcon: () -> Unit,
     onClickCard: (ProductItem) -> Unit,
     onClickAddToBasket: (ProductItem) -> Unit
 ) {
@@ -104,7 +111,8 @@ private fun Catalog(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopBar(
-                onClickBasketIcon = { onClickBasketIcon() }
+                onClickBasketIcon = onClickBasketIcon,
+                onClickSearchIcon = onClickSearchIcon
             )
         }
     ) { paddingValues ->
@@ -139,7 +147,8 @@ private fun Catalog(
 @Composable
 private fun TopBar(
     modifier: Modifier = Modifier,
-    onClickBasketIcon: () -> Unit
+    onClickBasketIcon: () -> Unit,
+    onClickSearchIcon: () -> Unit
 ) {
     CenterAlignedTopAppBar(
         title = {
@@ -165,6 +174,14 @@ private fun TopBar(
             IconButton(onClick = { onClickBasketIcon() }) {
                 Icon(
                     imageVector = Icons.Default.ShoppingBasket,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+
+            IconButton(onClick = { onClickSearchIcon() }) {
+                Icon(
+                    imageVector = Icons.Default.Search,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )

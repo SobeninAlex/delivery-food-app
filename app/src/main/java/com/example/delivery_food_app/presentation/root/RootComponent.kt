@@ -5,6 +5,7 @@ import com.arkivanov.decompose.value.Value
 import com.example.delivery_food_app.presentation.basket.BasketComponent
 import com.example.delivery_food_app.presentation.catalog.CatalogComponent
 import com.example.delivery_food_app.presentation.details.DetailsComponent
+import com.example.delivery_food_app.presentation.search.SearchComponent
 
 interface RootComponent {
 
@@ -16,6 +17,8 @@ interface RootComponent {
         data class Catalog(val component: CatalogComponent) : Child
 
         data class Details(val component: DetailsComponent) : Child
+
+        data class Search(val component: SearchComponent) : Child
     }
 
 }

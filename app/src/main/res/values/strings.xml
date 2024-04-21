@@ -3,4 +3,6 @@
     <string name="in_basket">В корзину за %1$s</string>
     <string name="order">Заказать за за %1$s ₽</string>
     <string name="basket_title">Корзина</string>
+    <string name="empty_search">Ничего не нашлось :(</string>
+    <string name="enter_name_food">Введите название блюда,\nкоторое ищете</string>
 </resources>

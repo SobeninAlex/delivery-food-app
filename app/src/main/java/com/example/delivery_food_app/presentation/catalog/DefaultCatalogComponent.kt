@@ -18,6 +18,7 @@ class DefaultCatalogComponent @AssistedInject constructor(
     private val storeFactory: CatalogStoreFactory,
     @Assisted("onProductItemClicked") private val onProductItemClicked: (ProductItem) -> Unit,
     @Assisted("onBasketIconClicked") private val onBasketIconClicked: () -> Unit,
+    @Assisted("onSearchIconClicked") private val onSearchIconClicked: () -> Unit,
     @Assisted("componentContext") componentContext: ComponentContext,
 ) : CatalogComponent, ComponentContext by componentContext {
 
@@ -34,6 +35,10 @@ class DefaultCatalogComponent @AssistedInject constructor(
 
                     is CatalogStore.Label.ClickBasketIcon -> {
                         onBasketIconClicked()
+                    }
+
+                    CatalogStore.Label.ClickSearchIcon -> {
+                        onSearchIconClicked()
                     }
                 }
             }
@@ -59,11 +64,16 @@ class DefaultCatalogComponent @AssistedInject constructor(
         store.accept(CatalogStore.Intent.ClickBasketIcon)
     }
 
+    override fun onClickSearchIcon() {
+        store.accept(CatalogStore.Intent.ClickSearchIcon)
+    }
+
     @AssistedFactory
     interface Factory {
         fun create(
             @Assisted("onProductItemClicked") onProductItemClicked: (ProductItem) -> Unit,
             @Assisted("onBasketIconClicked") onBasketIconClicked: () -> Unit,
+            @Assisted("onSearchIconClicked") onSearchIconClicked: () -> Unit,
             @Assisted("componentContext") componentContext: ComponentContext,
         ): DefaultCatalogComponent
     }

@@ -22,6 +22,8 @@ interface SearchStore : Store<Intent, State, Label> {
 
         data object ClickBack : Intent
 
+        data object ClickSearch : Intent
+
         data class ClickProduct(val productItem: ProductItem) : Intent
 
         data class ClickAddToBasket(val productItem: ProductItem) : Intent
@@ -109,11 +111,30 @@ class SearchStoreFactory @Inject constructor(
                     }
                 }
 
-                is Intent.ClickBack -> {
+                is Intent.ClickSearch -> {
+                    searchJob?.cancel()
 
+                    searchJob = scope.launch {
+                        dispatch(Msg.Loading)
+                        val searchQuery = getState().searchQuery
+                        try {
+                            if (searchQuery.isNotBlank()) {
+                                val products = searchProductUseCase(searchQuery)
+                                dispatch(Msg.SuccessLoaded(products = products))
+                            }
+                        } catch (e: Exception) {
+                            dispatch(Msg.Error)
+                        }
+                    }
                 }
-                is Intent.ClickProduct -> {}
 
+                is Intent.ClickBack -> {
+                    publish(Label.ClickBack)
+                }
+
+                is Intent.ClickProduct -> {
+                    publish(Label.ClickProduct(intent.productItem))
+                }
             }
         }
 
@@ -121,8 +142,35 @@ class SearchStoreFactory @Inject constructor(
     }
 
     private object ReducerImpl : Reducer<State, Msg> {
-        override fun State.reduce(message: Msg): State =
-            when (message) {
+        override fun State.reduce(msg: Msg): State = when (msg) {
+            is Msg.ChangeSearchQuery -> {
+                copy(
+                    searchQuery = msg.searchQuery
+                )
             }
+
+            is Msg.Error -> {
+                copy(
+                    searchState = State.SearchState.Error
+                )
+            }
+
+            is Msg.Loading -> {
+                copy(
+                    searchState = State.SearchState.Loading
+                )
+            }
+
+            is Msg.SuccessLoaded -> {
+                val searchState = if (msg.products.isEmpty()) {
+                    State.SearchState.EmptyResult
+                } else {
+                    State.SearchState.SuccessLoaded(msg.products)
+                }
+
+                copy(searchState = searchState)
+            }
+        }
     }
+
 }

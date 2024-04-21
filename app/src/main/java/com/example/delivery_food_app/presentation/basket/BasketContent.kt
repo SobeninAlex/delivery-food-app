@@ -72,18 +72,10 @@ fun BasketContent(
 
         when (val current = state.productState) {
             is BasketStore.State.ProductState.EmptyResult -> {
-                EmptyBasket(modifier = modifier.padding(paddingValues))
+                EmptyBasket()
             }
 
-            is BasketStore.State.ProductState.Initial -> {
-                Box(modifier = modifier.fillMaxSize()) {
-                    CircularProgressIndicator(
-                        modifier = modifier
-                            .align(Alignment.Center),
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-            }
+            is BasketStore.State.ProductState.Initial -> {}
 
             is BasketStore.State.ProductState.Loaded -> {
                 Content(
@@ -291,10 +283,10 @@ private fun EmptyBasket(
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
         Text(
-            modifier = modifier.align(Alignment.Center),
             text = "Корзина пуста",
             style = MaterialTheme.typography.bodySmall.copy(
                 fontSize = 18.sp

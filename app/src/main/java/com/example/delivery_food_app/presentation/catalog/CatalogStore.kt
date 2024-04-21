@@ -25,6 +25,8 @@ interface CatalogStore : Store<Intent, State, Label> {
         data class ClickRemoveFromBasket(val productItem: ProductItem) : Intent
 
         data object ClickBasketIcon : Intent
+
+        data object ClickSearchIcon : Intent
     }
 
     data class State(
@@ -46,6 +48,8 @@ interface CatalogStore : Store<Intent, State, Label> {
         data class ClickProduct(val productItem: ProductItem) : Label
 
         data object ClickBasketIcon : Label
+
+        data object ClickSearchIcon : Label
     }
 
 }
@@ -118,6 +122,10 @@ class CatalogStoreFactory @Inject constructor(
 
                 is Intent.ClickBasketIcon -> {
                     publish(Label.ClickBasketIcon)
+                }
+
+                Intent.ClickSearchIcon -> {
+                    publish(Label.ClickSearchIcon)
                 }
             }
         }

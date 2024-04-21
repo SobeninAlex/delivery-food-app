@@ -1,21 +1,22 @@
-package com.example.delivery_food_app.presentation.catalog
+package com.example.delivery_food_app.presentation.search
 
-import com.example.delivery_food_app.domain.entity.Product
 import com.example.delivery_food_app.domain.entity.ProductItem
 import kotlinx.coroutines.flow.StateFlow
 
-interface CatalogComponent {
+interface SearchComponent {
 
-    val model: StateFlow<CatalogStore.State>
+    val model: StateFlow<SearchStore.State>
+
+    fun changeSearchQuery(searchQuery: String)
+
+    fun onClickBack()
+
+    fun onClickSearch()
 
     fun onClickProduct(productItem: ProductItem)
 
     fun onClickAddToBasket(productItem: ProductItem)
 
     fun onClickRemoveFromBasket(productItem: ProductItem)
-
-    fun onClickBasketIcon()
-
-    fun onClickSearchIcon()
 
 }

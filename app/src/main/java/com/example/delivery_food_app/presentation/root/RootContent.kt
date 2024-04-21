@@ -8,6 +8,7 @@ import com.arkivanov.decompose.extensions.compose.jetpack.stack.Children
 import com.example.delivery_food_app.presentation.basket.BasketContent
 import com.example.delivery_food_app.presentation.catalog.CatalogContent
 import com.example.delivery_food_app.presentation.details.DetailsContent
+import com.example.delivery_food_app.presentation.search.SearchContent
 import com.example.delivery_food_app.presentation.ui.theme.DeliveryfoodappTheme
 
 @Composable
@@ -30,6 +31,10 @@ fun RootContent(
 
                     is RootComponent.Child.Details -> {
                         DetailsContent(component = instance.component)
+                    }
+
+                    is RootComponent.Child.Search -> {
+                        SearchContent(component = instance.component)
                     }
                 }
             }
