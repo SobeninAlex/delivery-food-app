@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class ProductItem(
-    var count: Int = 1,
+    var count: Int = 0,
     var price: Int = 0,
     val product: Product
 ) : Parcelable {

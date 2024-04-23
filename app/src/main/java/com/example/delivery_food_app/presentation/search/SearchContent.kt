@@ -1,33 +1,31 @@
 package com.example.delivery_food_app.presentation.search
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.delivery_food_app.R
+import com.example.delivery_food_app.presentation.ui.component.CatalogProducts
 import com.example.delivery_food_app.presentation.ui.component.Loader
+import com.example.delivery_food_app.presentation.ui.component.SomeWrong
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchContent(
     modifier: Modifier = Modifier,
@@ -35,25 +33,54 @@ fun SearchContent(
 ) {
     val state by component.model.collectAsState()
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.onBackground,
-        topBar = {
-            TopBar(
-                onClickBack = {
-                    component.onClickBack()
-                }
+    SearchBar(
+        query = state.searchQuery,
+        onQueryChange = {
+            component.changeSearchQuery(it)
+        },
+        onSearch = {
+            component.onClickSearch()
+        },
+        active = true,
+        onActiveChange = {},
+        leadingIcon = {
+            IconButton(
+                onClick = { component.onClickBack() },
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        },
+        trailingIcon = {
+            IconButton(onClick = { component.onClickSearch() }) {
+                Icon(
+                    imageVector = Icons.Default.Search,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onBackground
+                )
+            }
+        },
+        placeholder = {
+            Text(
+                text = stringResource(R.string.name_prod),
+                style = MaterialTheme.typography.bodySmall
             )
-        }
-    ) { paddingValues ->
-
+        },
+        colors = SearchBarDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.background
+        )
+    ) {
         when (val current = state.searchState) {
             is SearchStore.State.SearchState.EmptyResult -> {
-                EmptyResult(modifier = modifier.padding(paddingValues))
+                EmptyResult()
             }
 
-            is SearchStore.State.SearchState.Error -> {}
+            is SearchStore.State.SearchState.Error -> {
+                SomeWrong()
+            }
 
             is SearchStore.State.SearchState.Initial -> {
                 SearchInitial()
@@ -64,7 +91,18 @@ fun SearchContent(
             }
 
             is SearchStore.State.SearchState.SuccessLoaded -> {
-
+                CatalogProducts(
+                    products = current.products,
+                    onClickCard = {
+                        component.onClickProduct(it)
+                    },
+                    onClickAddToBasket = {
+                        component.onClickAddToBasket(it)
+                    },
+                    onClickRemoveFromBasket = {
+                        component.onClickRemoveFromBasket(it)
+                    }
+                )
             }
         }
     }
@@ -103,38 +141,4 @@ private fun SearchInitial(
             )
         )
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun TopBar(
-    modifier: Modifier = Modifier,
-    onClickBack: () -> Unit,
-) {
-    TopAppBar(
-        modifier = modifier
-            .shadow(elevation = 2.dp),
-        title = {
-            Text(
-                modifier = modifier.padding(start = 14.dp),
-                text = stringResource(R.string.basket_title),
-                style = MaterialTheme.typography.titleMedium,
-            )
-        },
-        navigationIcon = {
-            IconButton(
-                modifier = modifier.background(color = Color.Transparent),
-                onClick = { onClickBack() },
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background
-        )
-    )
 }

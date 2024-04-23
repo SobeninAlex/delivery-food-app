@@ -16,8 +16,10 @@ object ProductCatalog {
 
     fun searchProduct(query: String): List<ProductItem> {
         return _catalog.values.filter {
-            it.product.name.contains(query)
+            it.product.name.contains(query, ignoreCase = true)
         }
     }
+
+    fun getAllCatalog() = _catalog.values.toList()
 
 }

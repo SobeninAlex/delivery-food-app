@@ -23,7 +23,7 @@ class ProductCatalogRepositoryImpl @Inject constructor(
                 productItem = productItem
             )
         }
-        return productList
+        return ProductCatalog.getAllCatalog()
     }
 
 }

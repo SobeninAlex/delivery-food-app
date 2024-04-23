@@ -114,17 +114,20 @@ class SearchStoreFactory @Inject constructor(
                 is Intent.ClickSearch -> {
                     searchJob?.cancel()
 
-                    searchJob = scope.launch {
-                        dispatch(Msg.Loading)
-                        val searchQuery = getState().searchQuery
-                        try {
-                            if (searchQuery.isNotBlank()) {
+                    val searchQuery = getState().searchQuery
+
+                    if (searchQuery.isNotBlank()) {
+                        searchJob = scope.launch {
+                            dispatch(Msg.Loading)
+                            try {
                                 val products = searchProductUseCase(searchQuery)
                                 dispatch(Msg.SuccessLoaded(products = products))
+                            } catch (e: Exception) {
+                                dispatch(Msg.Error)
                             }
-                        } catch (e: Exception) {
-                            dispatch(Msg.Error)
                         }
+                    } else {
+                        dispatch(Msg.Error)
                     }
                 }
 

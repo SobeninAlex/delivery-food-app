@@ -141,10 +141,11 @@ fun Content(
     Box(
         modifier = modifier
             .fillMaxSize()
+            .padding(paddingValues),
     ) {
         LazyColumn(
             modifier = modifier.fillMaxSize(),
-            contentPadding = paddingValues,
+            contentPadding = PaddingValues(bottom = 74.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             items(

@@ -5,4 +5,6 @@
     <string name="basket_title">Корзина</string>
     <string name="empty_search">Ничего не нашлось :(</string>
     <string name="enter_name_food">Введите название блюда,\nкоторое ищете</string>
+    <string name="name_prod">Название блюда</string>
+    <string name="some_wrong">Что-то пошло не так :(</string>
 </resources>
