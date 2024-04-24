@@ -1,13 +1,20 @@
 package com.example.delivery_food_app.data.local
 
 import com.example.delivery_food_app.domain.entity.ProductItem
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flow
 
 object ProductCatalog {
 
     private val _catalog = mutableMapOf<Long, ProductItem>()
 
+    private val catalogChangeEvent = MutableSharedFlow<Unit>(replay = 1).apply {
+        tryEmit(Unit)
+    }
+
     fun addToCatalog(productItem: ProductItem) {
         _catalog[productItem.id] = productItem
+        catalogChangeEvent.tryEmit(Unit)
     }
 
     fun getProductItemFormCatalog(productId: Long): ProductItem {
@@ -20,6 +27,10 @@ object ProductCatalog {
         }
     }
 
-    fun getAllCatalog() = _catalog.values.toList()
+    fun getAllCatalog() = flow {
+        catalogChangeEvent.collect {
+            emit(_catalog.values.toList())
+        }
+    }
 
 }

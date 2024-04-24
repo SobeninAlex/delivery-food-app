@@ -1,17 +1,19 @@
 package com.example.delivery_food_app.presentation.catalog
 
+import android.util.Log
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
-import com.example.delivery_food_app.domain.entity.Product
 import com.example.delivery_food_app.domain.entity.ProductItem
-import com.example.delivery_food_app.domain.usecase.ChangeContentBasketUseCase
 import com.example.delivery_food_app.domain.usecase.GetProductsCatalogUseCase
 import com.example.delivery_food_app.presentation.catalog.CatalogStore.Intent
 import com.example.delivery_food_app.presentation.catalog.CatalogStore.Label
 import com.example.delivery_food_app.presentation.catalog.CatalogStore.State
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,17 +32,17 @@ interface CatalogStore : Store<Intent, State, Label> {
     }
 
     data class State(
-        val productsStatus: ProductStatus
+        val catalogStatus: CatalogStatus
     ) {
 
-        sealed interface ProductStatus {
-            data object Initial : ProductStatus
+        sealed interface CatalogStatus {
+            data object Initial : CatalogStatus
 
-            data object Loading : ProductStatus
+            data object Loading : CatalogStatus
 
-            data object Error : ProductStatus
+            data object Error : CatalogStatus
 
-            data class Loaded(val products: List<ProductItem>) : ProductStatus
+            data class Loaded(val catalog: List<ProductItem>) : CatalogStatus
         }
     }
 
@@ -56,7 +58,6 @@ interface CatalogStore : Store<Intent, State, Label> {
 
 class CatalogStoreFactory @Inject constructor(
     private val storeFactory: StoreFactory,
-    private val changeContentBasketUseCase: ChangeContentBasketUseCase,
     private val getProductsCatalogUseCase: GetProductsCatalogUseCase
 ) {
 
@@ -64,7 +65,7 @@ class CatalogStoreFactory @Inject constructor(
         object : CatalogStore, Store<Intent, State, Label> by storeFactory.create(
             name = "CatalogStore",
             initialState = State(
-                productsStatus = State.ProductStatus.Initial
+                catalogStatus = State.CatalogStatus.Initial
             ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = ::ExecutorImpl,
@@ -76,7 +77,7 @@ class CatalogStoreFactory @Inject constructor(
 
         data object CatalogLoadingError : Action
 
-        data class CatalogLoaded(val products: List<ProductItem>) : Action
+        data class CatalogLoaded(val catalog: List<ProductItem>) : Action
     }
 
     private sealed interface Msg {
@@ -84,7 +85,7 @@ class CatalogStoreFactory @Inject constructor(
 
         data object CatalogLoadingError : Msg
 
-        data class CatalogLoaded(val products: List<ProductItem>) : Msg
+        data class CatalogLoaded(val catalog: List<ProductItem>) : Msg
     }
 
     private inner class BootstrapperImpl : CoroutineBootstrapper<Action>() {
@@ -92,8 +93,9 @@ class CatalogStoreFactory @Inject constructor(
             scope.launch {
                 dispatch(Action.CatalogStartLoading)
                 try {
-                    val catalog = getProductsCatalogUseCase()
-                    dispatch(Action.CatalogLoaded(catalog))
+                    getProductsCatalogUseCase.getProductCatalog().collect {
+                        dispatch(Action.CatalogLoaded(it))
+                    }
                 } catch (e: Exception) {
                     dispatch(Action.CatalogLoadingError)
                 }
@@ -106,7 +108,7 @@ class CatalogStoreFactory @Inject constructor(
             when (intent) {
                 is Intent.ClickAddToBasket -> {
                     scope.launch {
-                        changeContentBasketUseCase.addToBasket(intent.productItem)
+                        getProductsCatalogUseCase.addToBasket(intent.productItem)
                     }
                 }
 
@@ -116,7 +118,7 @@ class CatalogStoreFactory @Inject constructor(
 
                 is Intent.ClickRemoveFromBasket -> {
                     scope.launch {
-                        changeContentBasketUseCase.removeFromBasket(intent.productItem)
+                        getProductsCatalogUseCase.removeFromBasket(intent.productItem)
                     }
                 }
 
@@ -133,7 +135,7 @@ class CatalogStoreFactory @Inject constructor(
         override fun executeAction(action: Action, getState: () -> State) {
             when (action) {
                 is Action.CatalogLoaded -> {
-                    dispatch(Msg.CatalogLoaded(action.products))
+                    dispatch(Msg.CatalogLoaded(action.catalog))
                 }
 
                 is Action.CatalogLoadingError -> {
@@ -151,19 +153,19 @@ class CatalogStoreFactory @Inject constructor(
         override fun State.reduce(msg: Msg): State = when (msg) {
             is Msg.CatalogLoaded -> {
                 copy(
-                    productsStatus = State.ProductStatus.Loaded(msg.products)
+                    catalogStatus = State.CatalogStatus.Loaded(msg.catalog)
                 )
             }
 
             is Msg.CatalogLoadingError -> {
                 copy(
-                    productsStatus = State.ProductStatus.Error
+                    catalogStatus = State.CatalogStatus.Error
                 )
             }
 
             is Msg.CatalogStartLoading -> {
                 copy(
-                    productsStatus = State.ProductStatus.Loading
+                    catalogStatus = State.CatalogStatus.Loading
                 )
             }
         }

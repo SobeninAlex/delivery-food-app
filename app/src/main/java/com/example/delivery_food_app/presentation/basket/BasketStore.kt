@@ -8,6 +8,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.domain.usecase.ChangeContentBasketUseCase
 import com.example.delivery_food_app.domain.usecase.GetContentBasketUseCase
+import com.example.delivery_food_app.domain.usecase.GetProductsCatalogUseCase
 import com.example.delivery_food_app.presentation.basket.BasketStore.Intent
 import com.example.delivery_food_app.presentation.basket.BasketStore.Label
 import com.example.delivery_food_app.presentation.basket.BasketStore.State

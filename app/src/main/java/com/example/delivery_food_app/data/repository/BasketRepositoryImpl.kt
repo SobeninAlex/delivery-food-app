@@ -1,9 +1,9 @@
 package com.example.delivery_food_app.data.repository
 
 import android.util.Log
+import com.example.delivery_food_app.data.local.ProductCatalog
 import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.domain.repository.BasketRepository
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -36,16 +36,18 @@ class BasketRepositoryImpl @Inject constructor() : BasketRepository {
                 count = newCount,
                 price = newPrice
             )
+            ProductCatalog.addToCatalog(newProductItem)
             _basketList[item.id] = newProductItem
             Log.d("Basket", "edit product $newProductItem")
         } else {
-            val newProduct = ProductItem(
+            val newProductItem = ProductItem(
                 count = 1,
                 price = productItem.product.priceCurrent,
                 product = productItem.product
             )
-            _basketList[productItem.id] = newProduct
-            Log.d("Basket", "add new product $newProduct")
+            ProductCatalog.addToCatalog(newProductItem)
+            _basketList[productItem.id] = newProductItem
+            Log.d("Basket", "add new product $newProductItem")
         }
 
         basketChangeEvent.tryEmit(Unit)
@@ -64,9 +66,11 @@ class BasketRepositoryImpl @Inject constructor() : BasketRepository {
                 count = newCount,
                 price = newPrice
             )
+            ProductCatalog.addToCatalog(newProductItem)
             _basketList[item.id] = newProductItem
             Log.d("Basket", "edit product $newProductItem")
         } else {
+            ProductCatalog.addToCatalog(productItem.copy(count = 0))
             _basketList.remove(productItem.id)
             Log.d("Basket", "remove product")
         }
