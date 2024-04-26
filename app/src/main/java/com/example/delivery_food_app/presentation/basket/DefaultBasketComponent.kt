@@ -50,6 +50,10 @@ class DefaultBasketComponent @AssistedInject constructor(
         store.accept(BasketStore.Intent.ClickRemoveFromBasket(productItem))
     }
 
+    override fun onSwipeToDeleteProductItem(productItem: ProductItem) {
+        store.accept(BasketStore.Intent.SwipeToDeleteProductItem(productItem))
+    }
+
     @AssistedFactory
     interface Factory {
         fun create(

@@ -12,4 +12,6 @@ interface BasketRepository {
 
     suspend fun removeFromBasket(productItem: ProductItem)
 
+    suspend fun deleteItemProduct(productItem: ProductItem)
+
 }

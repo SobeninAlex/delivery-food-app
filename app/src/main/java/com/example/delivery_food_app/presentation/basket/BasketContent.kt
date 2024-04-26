@@ -1,7 +1,15 @@
 package com.example.delivery_food_app.presentation.basket
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideIn
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +27,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -27,27 +37,40 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.fade
 import com.example.delivery_food_app.R
 import com.example.delivery_food_app.domain.entity.Product
 import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.presentation.ui.component.Counter
 import com.example.delivery_food_app.presentation.ui.component.LineThroughText
 import com.example.delivery_food_app.presentation.ui.theme.ButtonsCounterColor
+import kotlin.math.abs
 
 
 @Composable
@@ -86,6 +109,9 @@ fun BasketContent(
                     },
                     onClickRemovedFromBasket = {
                         component.onClickRemoveFromBasket(it)
+                    },
+                    onSwipeToDeleteProductItem = {
+                        component.onSwipeToDeleteProductItem(it)
                     }
                 )
             }
@@ -127,13 +153,15 @@ private fun TopBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun Content(
     modifier: Modifier = Modifier,
     products: List<ProductItem>,
     paddingValues: PaddingValues,
     onClickRemovedFromBasket: (ProductItem) -> Unit,
-    onClickAddToBasket: (ProductItem) -> Unit
+    onClickAddToBasket: (ProductItem) -> Unit,
+    onSwipeToDeleteProductItem: (ProductItem) -> Unit,
 ) {
 
     val totalPrice = products.sumOf { it.price }
@@ -154,16 +182,60 @@ fun Content(
                     it.id
                 }
             ) { productItem ->
-                ProductItem(
-                    product = productItem.product,
-                    count = productItem.count.toString(),
-                    onClickRemovedFromBasket = {
-                        onClickRemovedFromBasket(productItem)
-                    },
-                    onClickAddToBasket = {
-                        onClickAddToBasket(productItem)
-                    }
+
+
+                SwipeToDismissWithAnimation(
+                    modifier = Modifier.animateItemPlacement(),
+                    productItem = productItem,
+                    onSwipeToDeleteProductItem = { onSwipeToDeleteProductItem(it) },
+                    onClickAddToBasket = { onClickAddToBasket(it) },
+                    onClickRemovedFromBasket = { onClickRemovedFromBasket(it) }
                 )
+
+
+//                val dismissState = rememberSwipeToDismissBoxState(
+//                    confirmValueChange = { swipeToDismiss ->
+//                        if (swipeToDismiss == SwipeToDismissBoxValue.EndToStart) {
+//                            onSwipeToDeleteProductItem(productItem)
+//                        }
+//                        true
+//                    },
+//                    positionalThreshold = { threshold ->
+//                        threshold * 2
+//                    }
+//                )
+//
+//                SwipeToDismissBox(
+//                    modifier = Modifier.animateItemPlacement(),
+//                    state = dismissState,
+//                    backgroundContent = {
+//                        Box(
+//                            modifier = Modifier
+//                                .padding(32.dp)
+//                                .fillMaxSize(),
+//                            contentAlignment = Alignment.CenterEnd
+//                        ) {
+//                            Icon(
+//                                modifier = Modifier.size(48.dp),
+//                                imageVector = Icons.Default.DeleteSweep,
+//                                contentDescription = null,
+//                                tint = Color.Gray
+//                            )
+//                        }
+//                    },
+//                    enableDismissFromStartToEnd = false
+//                ) {
+//                    ProductItem(
+//                        product = productItem.product,
+//                        count = productItem.count.toString(),
+//                        onClickRemovedFromBasket = {
+//                            onClickRemovedFromBasket(productItem)
+//                        },
+//                        onClickAddToBasket = {
+//                            onClickAddToBasket(productItem)
+//                        }
+//                    )
+//                }
             }
         }
 
@@ -193,6 +265,93 @@ fun Content(
                     color = Color.White
                 )
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwipeToDismissWithAnimation(
+    modifier: Modifier = Modifier,
+    onSwipeToDeleteProductItem: (ProductItem) -> Unit,
+    onClickRemovedFromBasket: (ProductItem) -> Unit,
+    onClickAddToBasket: (ProductItem) -> Unit,
+    productItem: ProductItem
+) {
+    val dismissState = rememberSwipeToDismissBoxState(
+        confirmValueChange = { swipeToDismiss ->
+            if (swipeToDismiss == SwipeToDismissBoxValue.EndToStart) {
+                onSwipeToDeleteProductItem(productItem)
+            }
+            true
+        },
+        positionalThreshold = { threshold ->
+            threshold * 2
+        }
+    )
+
+    SwipeToDismissBox(
+        modifier = modifier,
+        state = dismissState,
+        backgroundContent = {
+            BackgroundProductItem(state = dismissState)
+//            Box(
+//                modifier = Modifier
+//                    .padding(32.dp)
+//                    .fillMaxSize(),
+//                contentAlignment = Alignment.CenterEnd
+//            ) {
+//                Icon(
+//                    modifier = Modifier.size(48.dp),
+//                    imageVector = Icons.Default.DeleteSweep,
+//                    contentDescription = null,
+//                    tint = Color.Gray
+//                )
+//            }
+        },
+        enableDismissFromStartToEnd = false
+    ) {
+        ProductItem(
+            product = productItem.product,
+            count = productItem.count.toString(),
+            onClickRemovedFromBasket = {
+                onClickRemovedFromBasket(productItem)
+            },
+            onClickAddToBasket = {
+                onClickAddToBasket(productItem)
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BackgroundProductItem(
+    state: SwipeToDismissBoxState
+) {
+    val isIconVisible = state.currentValue > state.dismissDirection
+    Box(
+        modifier = Modifier
+            .padding(end = 32.dp)
+            .fillMaxSize(),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        AnimatedVisibility(
+            visible = isIconVisible,
+            enter = fadeIn(animationSpec = tween(800)) + slideIn(
+                animationSpec = tween(1000),
+                initialOffset = {
+                    IntOffset(x = it.width, y = 0)
+                }
+            )
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(38.dp),
+                imageVector = Icons.Default.DeleteSweep,
+                contentDescription = null,
+                tint = Color.Red
+            )
         }
     }
 }

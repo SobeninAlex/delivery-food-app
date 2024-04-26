@@ -14,4 +14,6 @@ interface BasketComponent {
 
     fun onClickRemoveFromBasket(productItem: ProductItem)
 
+    fun onSwipeToDeleteProductItem(productItem: ProductItem)
+
 }

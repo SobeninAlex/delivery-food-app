@@ -15,4 +15,7 @@ class ChangeContentBasketUseCase @Inject constructor(
     suspend fun removeFromBasket(productItem: ProductItem) =
         repository.removeFromBasket(productItem = productItem)
 
+    suspend fun deleteProductItem(productItem: ProductItem) =
+        repository.deleteItemProduct(productItem)
+
 }

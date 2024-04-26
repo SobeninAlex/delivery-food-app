@@ -24,6 +24,7 @@ class BasketRepositoryImpl @Inject constructor() : BasketRepository {
         }
     }
 
+
     override suspend fun addToBasket(productItem: ProductItem) {
         val item = basketList.find {
             it.id == productItem.id
@@ -70,7 +71,22 @@ class BasketRepositoryImpl @Inject constructor() : BasketRepository {
             _basketList[item.id] = newProductItem
             Log.d("Basket", "edit product $newProductItem")
         } else {
-            ProductCatalog.addToCatalog(productItem.copy(count = 0))
+            ProductCatalog.addToCatalog(productItem.copy(count = 0, price = 0))
+            _basketList.remove(productItem.id)
+            Log.d("Basket", "remove product")
+        }
+
+        basketChangeEvent.tryEmit(Unit)
+        Log.d("Basket", "emit basketList")
+    }
+
+    override suspend fun deleteItemProduct(productItem: ProductItem) {
+        val item = basketList.find {
+            it.id == productItem.id
+        }
+
+        if (item != null) {
+            ProductCatalog.addToCatalog(productItem.copy(count = 0, price = 0))
             _basketList.remove(productItem.id)
             Log.d("Basket", "remove product")
         }

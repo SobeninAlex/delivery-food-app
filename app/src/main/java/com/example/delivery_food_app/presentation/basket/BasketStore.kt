@@ -23,6 +23,8 @@ interface BasketStore : Store<Intent, State, Label> {
         data class ClickAddToBasket(val productItem: ProductItem) : Intent
 
         data class ClickRemoveFromBasket(val productItem: ProductItem) : Intent
+
+        data class SwipeToDeleteProductItem(val productItem: ProductItem) : Intent
     }
 
     data class State(
@@ -66,7 +68,6 @@ class BasketStoreFactory @Inject constructor(
 
     private sealed interface Msg {
         data class BasketContentLoaded(val products: List<ProductItem>) : Msg
-
     }
 
     private inner class BootstrapperImpl : CoroutineBootstrapper<Action>() {
@@ -96,6 +97,12 @@ class BasketStoreFactory @Inject constructor(
 
                 is Intent.ClickBack -> {
                     publish(Label.ClickBack)
+                }
+
+                is Intent.SwipeToDeleteProductItem -> {
+                    scope.launch {
+                        changeContentBasketUseCase.deleteProductItem(intent.productItem)
+                    }
                 }
             }
         }
