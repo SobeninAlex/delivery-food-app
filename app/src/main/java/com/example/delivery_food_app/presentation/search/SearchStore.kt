@@ -120,8 +120,9 @@ class SearchStoreFactory @Inject constructor(
                         searchJob = scope.launch {
                             dispatch(Msg.Loading)
                             try {
-                                val products = searchProductUseCase(searchQuery)
-                                dispatch(Msg.SuccessLoaded(products = products))
+                                searchProductUseCase(searchQuery).collect {
+                                    dispatch(Msg.SuccessLoaded(products = it))
+                                }
                             } catch (e: Exception) {
                                 dispatch(Msg.Error)
                             }

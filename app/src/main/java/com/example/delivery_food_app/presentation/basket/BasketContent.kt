@@ -22,7 +22,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +47,7 @@ import com.example.delivery_food_app.domain.entity.Product
 import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.presentation.ui.component.Counter
 import com.example.delivery_food_app.presentation.ui.component.LineThroughText
+import com.example.delivery_food_app.presentation.ui.theme.ButtonsCounterColor
 
 
 @Composable
@@ -253,6 +253,8 @@ private fun ProductItem(
                     Counter(
                         modifier = modifier.weight(1f),
                         count = count,
+                        buttonsColor = ButtonsCounterColor,
+                        size = 47.dp,
                         onClickMinus = { onClickRemovedFromBasket() },
                         onClickPlus = { onClickAddToBasket() }
                     )

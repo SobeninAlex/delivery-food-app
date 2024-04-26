@@ -1,6 +1,7 @@
 package com.example.delivery_food_app.presentation.ui.component
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,11 +28,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.delivery_food_app.R
 import com.example.delivery_food_app.domain.entity.ProductItem
-import com.example.delivery_food_app.presentation.basket.BasketStore
 import com.example.delivery_food_app.presentation.ui.theme.ContainerColor
 
 
@@ -154,7 +155,14 @@ private fun ProductCard(
                         }
                     } else {
                         Counter(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(40.dp)
+                                .align(Alignment.BottomCenter),
+                            horizontalArrangement = Arrangement.SpaceAround,
                             count = productItem.count.toString(),
+                            size = 40.dp,
+                            buttonsColor = MaterialTheme.colorScheme.background,
                             onClickPlus = { onClickAddToBasket() },
                             onClickMinus = { onClickRemoveFromBasket() }
                         )
