@@ -1,6 +1,7 @@
 package com.example.delivery_food_app.data.local
 
 import com.example.delivery_food_app.domain.entity.ProductItem
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flow
 
@@ -21,9 +22,12 @@ object ProductCatalog {
         return _catalog[productId] ?: throw RuntimeException("item not found")
     }
 
-    fun searchProduct(query: String): List<ProductItem> {
-        return _catalog.values.filter {
+    fun searchProduct(query: String): Flow<List<ProductItem>> = flow {
+        val catalog = _catalog.values.filter {
             it.product.name.contains(query, ignoreCase = true)
+        }
+        catalogChangeEvent.collect {
+            emit(catalog)
         }
     }
 

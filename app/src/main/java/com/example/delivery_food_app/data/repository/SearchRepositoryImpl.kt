@@ -10,18 +10,14 @@ import javax.inject.Inject
 
 class SearchRepositoryImpl @Inject constructor() : SearchRepository {
 
-    private val basketContentChangeEvent = MutableSharedFlow<Unit>(replay = 1).apply {
-        tryEmit(Unit)
-    }
+
 
     override fun search(query: String): Flow<List<ProductItem>> = flow {
-        basketContentChangeEvent.collect {
-            ProductCatalog.getAllCatalog().collect {
-                emit(it)
-            }
+
+        ProductCatalog.searchProduct(query).collect {
+            emit(it)
         }
+
     }
-
-
 
 }

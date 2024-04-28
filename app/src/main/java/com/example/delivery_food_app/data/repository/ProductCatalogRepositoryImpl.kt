@@ -29,24 +29,18 @@ class ProductCatalogRepositoryImpl @Inject constructor(
         tryEmit(Unit)
     }
 
-    init {
-        CoroutineScope(Dispatchers.Main).launch {
-            val productList = apiService.getProducts().map { it.toEntity() }.map {
-                ProductItem(
-                    product = it
-                )
-            }
-            productList.forEach { productItem ->
-                ProductCatalog.addToCatalog(
-                    productItem = productItem
-                )
-            }
-            basketContentChangeEvent.tryEmit(Unit)
-        }
-    }
-
     override val productCatalog: Flow<List<ProductItem>> = flow {
-        basketContentChangeEvent.tryEmit(Unit)
+        val productList = apiService.getProducts().map { it.toEntity() }.map {
+            ProductItem(
+                product = it
+            )
+        }
+        productList.forEach { productItem ->
+            ProductCatalog.addToCatalog(
+                productItem = productItem
+            )
+        }
+
         basketContentChangeEvent.collect {
             ProductCatalog.getAllCatalog().collect {
                 emit(it)
