@@ -71,16 +71,9 @@ private fun SplashScreen(
         })
         .build()
 
-//    val alpha = remember {
-//        Animatable(0f)
-//    }
-
     LaunchedEffect(key1 = true) {
-//        alpha.animateTo(
-//            targetValue = 1f,
-//            animationSpec = tween(700)
-//        )
         delay(1800)
+        navController.popBackStack()
         navController.navigate("main_screen")
     }
 
@@ -99,7 +92,6 @@ private fun SplashScreen(
                 }
             ),
             contentDescription = null,
-//            modifier = Modifier.alpha(alpha.value)
         )
     }
 }
