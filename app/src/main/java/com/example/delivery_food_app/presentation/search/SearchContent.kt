@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
+import androidx.room.util.query
 import com.example.delivery_food_app.R
 import com.example.delivery_food_app.presentation.ui.component.CatalogProducts
 import com.example.delivery_food_app.presentation.ui.component.Loader
@@ -39,7 +41,7 @@ fun SearchContent(
             component.changeSearchQuery(it)
         },
         onSearch = {
-            component.onClickSearch()
+            /*TODO*/
         },
         active = true,
         onActiveChange = {},
@@ -55,9 +57,9 @@ fun SearchContent(
             }
         },
         trailingIcon = {
-            IconButton(onClick = { component.onClickSearch() }) {
+            IconButton(onClick = { component.changeSearchQuery("") }) {
                 Icon(
-                    imageVector = Icons.Default.Search,
+                    imageVector = Icons.Default.Clear,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onBackground
                 )

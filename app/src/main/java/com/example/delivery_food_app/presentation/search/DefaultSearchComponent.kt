@@ -47,10 +47,6 @@ class DefaultSearchComponent @AssistedInject constructor(
         store.accept(SearchStore.Intent.ClickBack)
     }
 
-    override fun onClickSearch() {
-        store.accept(SearchStore.Intent.ClickSearch)
-    }
-
     override fun onClickProduct(productItem: ProductItem) {
         store.accept(SearchStore.Intent.ClickProduct(productItem))
     }

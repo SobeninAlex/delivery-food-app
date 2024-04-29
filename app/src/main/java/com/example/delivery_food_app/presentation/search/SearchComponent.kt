@@ -11,8 +11,6 @@ interface SearchComponent {
 
     fun onClickBack()
 
-    fun onClickSearch()
-
     fun onClickProduct(productItem: ProductItem)
 
     fun onClickAddToBasket(productItem: ProductItem)

@@ -22,8 +22,6 @@ interface SearchStore : Store<Intent, State, Label> {
 
         data object ClickBack : Intent
 
-        data object ClickSearch : Intent
-
         data class ClickProduct(val productItem: ProductItem) : Intent
 
         data class ClickAddToBasket(val productItem: ProductItem) : Intent
@@ -97,21 +95,6 @@ class SearchStoreFactory @Inject constructor(
             when (intent) {
                 is Intent.ChangeSearchQuery -> {
                     dispatch(Msg.ChangeSearchQuery(intent.searchQuery))
-                }
-
-                is Intent.ClickAddToBasket -> {
-                    scope.launch {
-                        changeContentBasketUseCase.addToBasket(intent.productItem)
-                    }
-                }
-
-                is Intent.ClickRemoveFromBasket -> {
-                    scope.launch {
-                        changeContentBasketUseCase.removeFromBasket(intent.productItem)
-                    }
-                }
-
-                is Intent.ClickSearch -> {
                     searchJob?.cancel()
 
                     val searchQuery = getState().searchQuery
@@ -129,6 +112,18 @@ class SearchStoreFactory @Inject constructor(
                         }
                     } else {
                         dispatch(Msg.Error)
+                    }
+                }
+
+                is Intent.ClickAddToBasket -> {
+                    scope.launch {
+                        changeContentBasketUseCase.addToBasket(intent.productItem)
+                    }
+                }
+
+                is Intent.ClickRemoveFromBasket -> {
+                    scope.launch {
+                        changeContentBasketUseCase.removeFromBasket(intent.productItem)
                     }
                 }
 
