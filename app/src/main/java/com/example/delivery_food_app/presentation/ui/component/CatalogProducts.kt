@@ -13,10 +13,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NewReleases
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -27,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -99,6 +103,36 @@ private fun ProductCard(
             Box(
                 modifier = modifier.clickable { onClickCard() },
             ) {
+
+                Column(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(6.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    val tags = productItem.product.tags
+
+                    if (tags.isNotEmpty()) {
+
+                        val resId = when (tags.first()) {
+                            2 -> R.drawable.vegan_tag
+                            4 -> R.drawable.spicy_tag
+                            else -> -1
+                        }
+
+                        if (resId > 0) {
+                            Image(painter = painterResource(id = resId), contentDescription = null)
+                        }
+                    }
+
+                    if (productItem.product.priceOld != null) {
+                        Image(
+                            painter = painterResource(id = R.drawable.sale_tag),
+                            contentDescription = null
+                        )
+                    }
+                }
+
                 Image(
                     modifier = modifier
                         .width(167.dp),
@@ -106,6 +140,7 @@ private fun ProductCard(
                     contentDescription = null
                 )
             }
+
             Column(
                 modifier = modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
