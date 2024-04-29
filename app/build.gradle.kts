@@ -53,6 +53,16 @@ android {
 
 dependencies {
 
+    //jetpack compose navigation
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    //splash
+    implementation("androidx.core:core-splashscreen:1.0.1")
+
+    //coil
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.coil-kt:coil-gif:2.6.0")
+
     //mvikotlin
     implementation(libs.mvikotlin)
     implementation(libs.mvikotlin.main)
