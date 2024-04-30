@@ -1,5 +1,6 @@
 package com.example.delivery_food_app.presentation.catalog
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
@@ -11,19 +12,22 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.runtime.State
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ScrollableTabRow
+import androidx.compose.material.Tab
+import androidx.compose.material.TabPosition
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocalGroceryStore
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.ShoppingBasket
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -35,23 +39,34 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.example.delivery_food_app.R
+import com.example.delivery_food_app.domain.entity.Category
+import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.presentation.ui.component.CatalogProducts
 import com.example.delivery_food_app.presentation.ui.component.Loader
+import com.example.delivery_food_app.utill.FancyAnimatedIndicator
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.PagerState
+import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.launch
 
+
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun CatalogContent(
     modifier: Modifier = Modifier,
@@ -79,20 +94,46 @@ fun CatalogContent(
             is CatalogStore.State.CatalogStatus.Initial -> {}
 
             is CatalogStore.State.CatalogStatus.Loaded -> {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    CatalogProducts(
-                        products = current.catalog,
-                        paddingValues = paddingValues,
-                        onClickCard = {
-                            component.onClickProduct(it)
-                        },
-                        onClickAddToBasket = {
-                            component.onClickAddToBasket(it)
-                        },
-                        onClickRemoveFromBasket = {
-                            component.onClickRemoveFromBasket(it)
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                ) {
+                    Column {
+                        val categorise = state.categories
+                        Log.d("CATEGORY", categorise.toString())
+
+                        val pagerState = rememberPagerState()
+
+                        CategoryTabs(
+                            categorise = categorise,
+                            pagerState = pagerState
+                        )
+
+                        HorizontalPager(
+                            state = pagerState,
+                            count = categorise.count(),
+                            userScrollEnabled = true
+                        ) { tabIndex ->
+                            val productsFilter = current.catalog.filter {
+                                it.product.categoryId == categorise[tabIndex].id
+                            }
+
+                            CatalogProducts(
+                                products = productsFilter,
+                                paddingValues = paddingValues,
+                                onClickCard = {
+                                    component.onClickProduct(it)
+                                },
+                                onClickAddToBasket = {
+                                    component.onClickAddToBasket(it)
+                                },
+                                onClickRemoveFromBasket = {
+                                    component.onClickRemoveFromBasket(it)
+                                }
+                            )
                         }
-                    )
+                    }
 
                     val visible = current.catalog.any { it.count > 0 }
                     val totalPrice = current.catalog.sumOf { it.price }
@@ -114,6 +155,54 @@ fun CatalogContent(
             }
         }
     }
+}
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+private fun CategoryTabs(
+    categorise: List<Category>,
+    pagerState: PagerState
+) {
+    var pagerPage by remember { mutableStateOf(0) }
+
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(key1 = pagerState.currentPage) {
+        pagerPage = pagerState.currentPage
+    }
+
+    val indicator = @Composable { tabPositions: List<TabPosition> ->
+        FancyAnimatedIndicator(
+            tabPositions = tabPositions,
+            selectedTabIndex = pagerPage
+        )
+    }
+
+    ScrollableTabRow(
+        edgePadding = 8.dp,
+        selectedTabIndex = pagerPage,
+        indicator = indicator,
+        backgroundColor = Color.Transparent,
+        tabs = {
+            categorise.forEachIndexed { index, category ->
+                Tab(
+                    modifier = Modifier.zIndex(2f),
+                    selected = index == pagerState.currentPage,
+                    onClick = {
+                        pagerPage = index
+                        scope.launch { pagerState.animateScrollToPage(index) }
+                    },
+                    text = {
+                        Text(
+                            text = category.name,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = if (index == pagerState.currentPage) Color.White else Color.Black
+                        )
+                    }
+                )
+            }
+        }
+    )
 }
 
 

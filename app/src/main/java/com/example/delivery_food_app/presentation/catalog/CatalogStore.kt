@@ -6,6 +6,7 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
+import com.example.delivery_food_app.domain.entity.Category
 import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.domain.usecase.GetProductsCatalogUseCase
 import com.example.delivery_food_app.presentation.catalog.CatalogStore.Intent
@@ -32,6 +33,7 @@ interface CatalogStore : Store<Intent, State, Label> {
     }
 
     data class State(
+        val categories: List<Category>,
         val catalogStatus: CatalogStatus
     ) {
 
@@ -65,6 +67,7 @@ class CatalogStoreFactory @Inject constructor(
         object : CatalogStore, Store<Intent, State, Label> by storeFactory.create(
             name = "CatalogStore",
             initialState = State(
+                categories = emptyList(),
                 catalogStatus = State.CatalogStatus.Initial
             ),
             bootstrapper = BootstrapperImpl(),
@@ -78,6 +81,8 @@ class CatalogStoreFactory @Inject constructor(
         data object CatalogLoadingError : Action
 
         data class CatalogLoaded(val catalog: List<ProductItem>) : Action
+
+        data class CategoryLoaded(val categories: List<Category>) : Action
     }
 
     private sealed interface Msg {
@@ -86,6 +91,8 @@ class CatalogStoreFactory @Inject constructor(
         data object CatalogLoadingError : Msg
 
         data class CatalogLoaded(val catalog: List<ProductItem>) : Msg
+
+        data class CategoryLoaded(val categories: List<Category>) : Msg
     }
 
     private inner class BootstrapperImpl : CoroutineBootstrapper<Action>() {
@@ -93,6 +100,9 @@ class CatalogStoreFactory @Inject constructor(
             scope.launch {
                 dispatch(Action.CatalogStartLoading)
                 try {
+                    getProductsCatalogUseCase.getCategories().collect {
+                        dispatch(Action.CategoryLoaded(it))
+                    }
                     getProductsCatalogUseCase.getProductCatalog().collect {
                         dispatch(Action.CatalogLoaded(it))
                     }
@@ -145,6 +155,10 @@ class CatalogStoreFactory @Inject constructor(
                 is Action.CatalogStartLoading -> {
                     dispatch(Msg.CatalogStartLoading)
                 }
+
+                is Action.CategoryLoaded -> {
+                    dispatch(Msg.CategoryLoaded(action.categories))
+                }
             }
         }
     }
@@ -166,6 +180,12 @@ class CatalogStoreFactory @Inject constructor(
             is Msg.CatalogStartLoading -> {
                 copy(
                     catalogStatus = State.CatalogStatus.Loading
+                )
+            }
+
+            is Msg.CategoryLoaded -> {
+                copy(
+                    categories = msg.categories
                 )
             }
         }

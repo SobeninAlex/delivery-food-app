@@ -10,6 +10,8 @@ class GetProductsCatalogUseCase @Inject constructor(
 
     fun getProductCatalog() = repository.productCatalog
 
+    fun getCategories() = repository.categories
+
     suspend fun addToBasket(productItem: ProductItem) = repository.addToBasket(productItem)
 
     suspend fun removeFromBasket(productItem: ProductItem) = repository.removeFromBasket(productItem)

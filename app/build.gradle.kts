@@ -63,6 +63,10 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("io.coil-kt:coil-gif:2.6.0")
 
+    //indicators
+    implementation("com.google.accompanist:accompanist-pager:0.27.1")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.27.1")
+
     //mvikotlin
     implementation(libs.mvikotlin)
     implementation(libs.mvikotlin.main)

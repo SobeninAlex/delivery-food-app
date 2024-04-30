@@ -3,6 +3,7 @@ package com.example.delivery_food_app.data.repository
 import com.example.delivery_food_app.data.local.ProductCatalog
 import com.example.delivery_food_app.data.mapper.toEntity
 import com.example.delivery_food_app.data.network.api.ApiService
+import com.example.delivery_food_app.domain.entity.Category
 import com.example.delivery_food_app.domain.entity.Product
 import com.example.delivery_food_app.domain.entity.ProductItem
 import com.example.delivery_food_app.domain.repository.BasketRepository
@@ -46,6 +47,16 @@ class ProductCatalogRepositoryImpl @Inject constructor(
                 emit(it)
             }
         }
+    }
+
+    override val categories: Flow<List<Category>> = flow {
+        val categories = apiService.getCategories().map {
+            Category(
+                id = it.id,
+                name = it.name
+            )
+        }
+        emit(categories)
     }
 
     override suspend fun addToBasket(productItem: ProductItem) {

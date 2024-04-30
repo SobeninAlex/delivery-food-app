@@ -1,5 +1,6 @@
 package com.example.delivery_food_app.presentation.catalog
 
+import com.example.delivery_food_app.domain.entity.Category
 import com.example.delivery_food_app.domain.entity.Product
 import com.example.delivery_food_app.domain.entity.ProductItem
 import kotlinx.coroutines.flow.StateFlow
