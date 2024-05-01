@@ -18,6 +18,10 @@ glideComposeVersion = "1.0.0-beta01"
 retrofitVersion = "2.9.0"
 okhttpVersion = "4.12.0"
 parcelizeVersion = "1.9.22"
+navigationComposeVersion = "2.7.7"
+splashscreenVersion = "1.0.1"
+coilComposeVersion = "2.6.0"
+accompanistPagerVersion = "0.27.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -34,6 +38,20 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
+
+#accompanist pager / indicators
+accompanist-pager = { group = "com.google.accompanist", name = "accompanist-pager", version.ref = "accompanistPagerVersion" }
+accompanist-pager-indicators = { group = "com.google.accompanist", name = "accompanist-pager-indicators", version.ref = "accompanistPagerVersion" }
+
+#coil compose / coil gif
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilComposeVersion" }
+coil-gif = { group = "io.coil-kt", name = "coil-gif", version.ref = "coilComposeVersion" }
+
+#splash
+splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreenVersion" }
+
+#navigation compose
+navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationComposeVersion" }
 
 #material-icons-extended
 material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }

@@ -53,21 +53,21 @@ android {
 
 dependencies {
 
-    //jetpack compose navigation
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+    //navigation compose
+    implementation(libs.navigation.compose)
 
     //splash
-    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation(libs.splashscreen)
 
-    //coil
-    implementation("io.coil-kt:coil-compose:2.6.0")
-    implementation("io.coil-kt:coil-gif:2.6.0")
+    //coil compose / coil gif
+    implementation(libs.coil.compose)
+    implementation(libs.coil.gif)
 
-    //indicators
-    implementation("com.google.accompanist:accompanist-pager:0.27.1")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.27.1")
+    //accompanist pager / indicators
+    implementation(libs.accompanist.pager)
+    implementation(libs.accompanist.pager.indicators)
 
-    //mvikotlin
+    //MVI Kotlin
     implementation(libs.mvikotlin)
     implementation(libs.mvikotlin.main)
     implementation(libs.mvikotlin.extensions.coroutines)
